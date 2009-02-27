@@ -47,6 +47,10 @@ static struct type_table {
     {-1,                    NULL}
 };
 
+// Prototypes
+void __lg(const char *func, size_t len, const char *fmt, ...)
+    __attribute__ ((format (printf, 3, 4)));
+
 void about(void) {
     fprintf(stderr, PACKAGE"-"VERSION);
     if (0 != strlen(GITHEAD))
