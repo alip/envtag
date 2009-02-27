@@ -1,0 +1,20 @@
+Description
+===========
+envtag is a simple audio tagger using taglib's c bindings. Interaction is done
+using environment variables which makes it perfect for shell scripts.
+
+Examples
+========
+* Reading tag information:
+eval `envtag /path/to/audio/file`
+echo "Title: $TITLE"
+echo "Artist: $ARTIST"
+echo "Album: $ALBUM"
+echo "Comment: $COMMENT"
+echo "Genre: $GENRE"
+echo "Year: $YEAR"
+echo "Track: $TRACK"
+
+* Saving tag information:
+COMMENT="Tagged by envtag" envtag -s *.mp3
+
