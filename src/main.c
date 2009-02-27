@@ -114,13 +114,16 @@ char *escape_quotes(const char *src) {
 }
 
 void tset(TagLib_File *fp) {
-    char *env_title = getenv("TITLE");
-    char *env_artist = getenv("ARTIST");
-    char *env_album = getenv("ALBUM");
-    char *env_comment = getenv("COMMENT");
-    char *env_genre = getenv("GENRE");
-    char *env_year = getenv("YEAR");
-    char *env_track = getenv("TRACK");
+    static char *env_title, *env_artist, *env_album, *env_comment;
+    static char *env_genre, *env_year, *env_track;
+
+    env_title = getenv("TITLE");
+    env_artist = getenv("ARTIST");
+    env_album = getenv("ALBUM");
+    env_comment = getenv("COMMENT");
+    env_genre = getenv("GENRE");
+    env_year = getenv("YEAR");
+    env_track = getenv("TRACK");
 
     TagLib_Tag *tags = taglib_file_tag(fp);
 
