@@ -53,15 +53,19 @@ void __lg(const char *func, size_t len, const char *fmt, ...)
 
 void about(void) {
     fprintf(stderr, PACKAGE"-"VERSION);
+#ifdef GITHEAD
     if (0 != strlen(GITHEAD))
         fprintf(stderr, "-"GITHEAD);
+#endif
     fputc('\n', stderr);
 }
 
 void usage(void) {
     fprintf(stderr, PACKAGE"-"VERSION);
+#ifdef GITHEAD
     if (0 != strlen(GITHEAD))
         fprintf(stderr, "-"GITHEAD);
+#endif
     fprintf(stderr, " simple audio tagger for use in shell scripts\n");
     fprintf(stderr, "Usage: "PACKAGE" [-t type] [-svhV] file...\n\n");
     fprintf(stderr, "Options:\n");
