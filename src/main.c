@@ -73,6 +73,7 @@ void usage(void) {
     fprintf(stderr, "\t-V, --version\t\tShow version information\n");
     fprintf(stderr, "\t-t TYPE --type=TYPE\tSpecify type\n");
     fprintf(stderr, "\t-s, --set\t\tSet tags\n");
+    fprintf(stderr, "\t-n, --no-unicode\tOperate on Latin1 strings\n");
     fprintf(stderr, "\t-v, --verbose\t\tBe verbose\n");
     fprintf(stderr, "\nTypes:\n");
     fprintf(stderr, "\tmpeg, vorbis, flac, mpc, oggflac, wavpack, speex, trueaudio\n");
@@ -197,17 +198,19 @@ int main(int argc, char **argv) {
     int verbose = 0;
     int set = 0;
     int type = -1;
+    int unicode = 1;
 
     static struct option long_options[] = {
-        {"version", no_argument,        NULL, 'V'},
-        {"help",    no_argument,        NULL, 'h'},
-        {"type",    required_argument,  NULL, 't'},
-        {"set",     no_argument,        NULL, 's'},
-        {"verbose", no_argument,        NULL, 'v'},
+        {"version",    no_argument,        NULL, 'V'},
+        {"help",       no_argument,        NULL, 'h'},
+        {"set",        no_argument,        NULL, 's'},
+        {"type",       required_argument,  NULL, 't'},
+        {"no-unicode", no_argument,        NULL, 'n'},
+        {"verbose",    no_argument,        NULL, 'v'},
         {0, 0, NULL, 0}
     };
 
-    while (-1 != (optc = getopt_long(argc, argv, "Vht:sv", long_options, NULL))) {
+    while (-1 != (optc = getopt_long(argc, argv, "Vhst:nv", long_options, NULL))) {
         switch (optc) {
             case 'h':
                 usage();
@@ -218,9 +221,6 @@ int main(int argc, char **argv) {
             case 's':
                 set = 1;
                 break;
-            case 'v':
-                verbose = 1;
-                break;
             case 't':
                 for (int i = 0; types[i].name != NULL; i++) {
                     if (0 == strncmp(optarg, types[i].name, strlen(types[i].name)))
@@ -230,6 +230,12 @@ int main(int argc, char **argv) {
                     lg("Unknown type `%s'", optarg);
                     return EX_USAGE;
                 }
+                break;
+            case 'n':
+                unicode = 0;
+                break;
+            case 'v':
+                verbose = 1;
                 break;
             case '?':
             default:
@@ -245,6 +251,9 @@ int main(int argc, char **argv) {
         argc -= (optind - 1);
         argv += (optind - 1);
     }
+
+    if (!unicode)
+        taglib_set_strings_unicode(0);
 
     for (int i = 1; i < argc; i++) {
         if (-1 == type)
