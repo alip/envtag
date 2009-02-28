@@ -111,8 +111,10 @@ char *escape_quotes(const char *src) {
     for (int i = 0, j = 0; i <= strlen(src); i++) {
         escaped_str = xrealloc(escaped_str, (j + 1) * sizeof(char));
         if ('\'' == src[i]) {
+            escaped_str[j++] = '\'';
+            escaped_str = xrealloc(escaped_str, (j + 3) * sizeof(char));
             escaped_str[j++] = '\\';
-            escaped_str = xrealloc(escaped_str, (j + 1) * sizeof(char));
+            escaped_str[j++] = '\'';
             escaped_str[j++] = '\'';
         }
         else
