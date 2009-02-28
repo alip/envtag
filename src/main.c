@@ -50,6 +50,7 @@ static struct type_table {
 // Prototypes
 void __lg(const char *func, size_t len, const char *fmt, ...)
     __attribute__ ((format (printf, 3, 4)));
+#define lg(...)     __lg(__func__, __LINE__, __VA_ARGS__)
 
 void about(void) {
     fprintf(stderr, PACKAGE"-"VERSION);
@@ -92,7 +93,6 @@ void __lg(const char *func, size_t len, const char *fmt, ...) {
 
     fputc('\n', stderr);
 }
-#define lg(...)     __lg(__func__, __LINE__, __VA_ARGS__)
 
 void *xrealloc(void *ptr, size_t size) {
     void *t;
