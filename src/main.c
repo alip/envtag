@@ -47,6 +47,17 @@ static struct type_table {
     {-1,                    NULL}
 };
 
+static struct id3v2_encoding_table {
+    int no;
+    const char *name;
+} id3v2_encodings[] = {
+    {TagLib_ID3v2_Latin1,   "latin1"},
+    {TagLib_ID3v2_UTF16,    "utf16"},
+    {TagLib_ID3v2_UTF16BE,  "utf16be"},
+    {TagLib_ID3v2_UTF8,     "utf8"},
+    {-1,                    NULL}
+};
+
 // Prototypes
 void __lg(const char *func, size_t len, const char *fmt, ...)
     __attribute__ ((format (printf, 3, 4)));
@@ -68,17 +79,20 @@ void usage(void) {
         fprintf(stderr, "-"GITHEAD);
 #endif
     fprintf(stderr, " simple audio tagger for use in shell scripts\n");
-    fprintf(stderr, "Usage: "PACKAGE" [-t type] [-svhV] file...\n\n");
+    fprintf(stderr, "Usage: "PACKAGE" [-t type] [-e encoding] [-svhVn] file...\n\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-h, --help\t\tYou're looking at it :)\n");
     fprintf(stderr, "\t-V, --version\t\tShow version information\n");
-    fprintf(stderr, "\t-t TYPE --type=TYPE\tSpecify type\n");
-    fprintf(stderr, "\t-s, --set\t\tSet tags\n");
-    fprintf(stderr, "\t-n, --no-unicode\tOperate on Latin1 strings\n");
     fprintf(stderr, "\t-v, --verbose\t\tBe verbose\n");
+    fprintf(stderr, "\t-s, --set\t\tSet tags\n");
+    fprintf(stderr, "\t-t TYPE, --type=TYPE\tSpecify type\n");
+    fprintf(stderr, "\t-e ENC, --encoding=ENC\tSpecify ID3v2 encoding\n");
+    fprintf(stderr, "\t-n, --no-unicode\tOperate on Latin1 strings\n");
     fprintf(stderr, "\nTypes:\n");
     fprintf(stderr, "\tmpeg, vorbis, flac, mpc, oggflac, wavpack, speex, trueaudio\n");
     fprintf(stderr, "\tIf no type is given, "PACKAGE" tries to determine it using filename\n");
+    fprintf(stderr, "\nPossible ID3v2 encoding values:\n");
+    fprintf(stderr, "\tlatin1, utf16, utf16be, utf8 (default)\n");
     fprintf(stderr, "\nEnvironment variables used in set mode:\n");
     fprintf(stderr, "\tTITLE, ARTIST, ALBUM, COMMENT, GENRE, YEAR, TRACK\n");
 }
@@ -199,18 +213,20 @@ int main(int argc, char **argv) {
     int set = 0;
     int type = -1;
     int unicode = 1;
+    int legal_enc = 0;
 
     static struct option long_options[] = {
         {"version",    no_argument,        NULL, 'V'},
         {"help",       no_argument,        NULL, 'h'},
         {"set",        no_argument,        NULL, 's'},
         {"type",       required_argument,  NULL, 't'},
+        {"encoding",   required_argument,  NULL, 'e'},
         {"no-unicode", no_argument,        NULL, 'n'},
         {"verbose",    no_argument,        NULL, 'v'},
         {0, 0, NULL, 0}
     };
 
-    while (-1 != (optc = getopt_long(argc, argv, "Vhst:nv", long_options, NULL))) {
+    while (-1 != (optc = getopt_long(argc, argv, "Vhst:e:nv", long_options, NULL))) {
         switch (optc) {
             case 'h':
                 usage();
@@ -231,6 +247,19 @@ int main(int argc, char **argv) {
                     return EX_USAGE;
                 }
                 break;
+            case 'e':
+                for (int i = 0; id3v2_encodings[i].name != NULL; i++) {
+                    if (0 == strncmp(optarg, id3v2_encodings[i].name, strlen(id3v2_encodings[i].name)))
+                    {
+                        legal_enc = 1;
+                        taglib_id3v2_set_default_text_encoding(id3v2_encodings[i].no);
+                        break;
+                    }
+                }
+                if (0 == legal_enc) {
+                    lg("Unknown encoding `%s'", optarg);
+                    return EX_USAGE;
+                }
             case 'n':
                 unicode = 0;
                 break;
