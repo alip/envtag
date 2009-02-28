@@ -162,11 +162,11 @@ void tprint(TagLib_File *fp) {
     char *album = escape_quotes(taglib_tag_album(tags));
     char *comment = escape_quotes(taglib_tag_comment(tags));
     char *genre = escape_quotes(taglib_tag_genre(tags));
-    printf("TITLE='%s'\n", title);
-    printf("ARTIST='%s'\n", artist);
-    printf("ALBUM='%s'\n", album);
-    printf("COMMENT='%s'\n", comment);
-    printf("GENRE='%s'\n", genre);
+    printf("TITLE=$'%s'\n", title);
+    printf("ARTIST=$'%s'\n", artist);
+    printf("ALBUM=$'%s'\n", album);
+    printf("COMMENT=$'%s'\n", comment);
+    printf("GENRE=$'%s'\n", genre);
     printf("YEAR=%d\n", taglib_tag_year(tags));
     printf("TRACK=%d\n", taglib_tag_track(tags));
 
