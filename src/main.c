@@ -91,7 +91,7 @@ void usage(void) {
     fprintf(stderr, "\t-t TYPE, --type=TYPE\tSpecify type\n");
     fprintf(stderr, "\t-e ENC, --encoding=ENC\tSpecify ID3v2 encoding\n");
     fprintf(stderr, "\t-n, --no-unicode\tOperate on Latin1 strings\n");
-    fprintf(stderr, "\t-E, --export\t\tPrepend every line with export\n");
+    fprintf(stderr, "\t-E, --export\t\tPrepend tag lines with export\n");
     fprintf(stderr, "\nTypes:\n");
     fprintf(stderr, "\tmpeg, vorbis, flac, mpc, oggflac, wavpack, speex, trueaudio\n");
     fprintf(stderr, "\tIf no type is given, "PACKAGE" tries to determine it using filename\n");
