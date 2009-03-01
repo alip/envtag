@@ -32,6 +32,9 @@
 #include "config.h"
 #endif
 
+static int verbose;
+static int export;
+
 static struct type_table {
     int no;
     const char *name;
@@ -79,7 +82,7 @@ void usage(void) {
         fprintf(stderr, "-"GITHEAD);
 #endif
     fprintf(stderr, " simple audio tagger for use in shell scripts\n");
-    fprintf(stderr, "Usage: "PACKAGE" [-t type] [-e encoding] [-svhVn] file...\n\n");
+    fprintf(stderr, "Usage: "PACKAGE" [-t type] [-e encoding] [-hVvsnE] file...\n\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-h, --help\t\tYou're looking at it :)\n");
     fprintf(stderr, "\t-V, --version\t\tShow version information\n");
@@ -88,6 +91,7 @@ void usage(void) {
     fprintf(stderr, "\t-t TYPE, --type=TYPE\tSpecify type\n");
     fprintf(stderr, "\t-e ENC, --encoding=ENC\tSpecify ID3v2 encoding\n");
     fprintf(stderr, "\t-n, --no-unicode\tOperate on Latin1 strings\n");
+    fprintf(stderr, "\t-E, --export\t\tPrepend every line with export\n");
     fprintf(stderr, "\nTypes:\n");
     fprintf(stderr, "\tmpeg, vorbis, flac, mpc, oggflac, wavpack, speex, trueaudio\n");
     fprintf(stderr, "\tIf no type is given, "PACKAGE" tries to determine it using filename\n");
@@ -172,6 +176,7 @@ void tset(TagLib_File *fp) {
 }
 
 void tprint(TagLib_File *fp) {
+    char *prefix = export ? "export " : "";
     // Tags
     const TagLib_Tag *tags = taglib_file_tag(fp);
     char *title = escape_quotes(taglib_tag_title(tags));
@@ -179,13 +184,14 @@ void tprint(TagLib_File *fp) {
     char *album = escape_quotes(taglib_tag_album(tags));
     char *comment = escape_quotes(taglib_tag_comment(tags));
     char *genre = escape_quotes(taglib_tag_genre(tags));
-    printf("TITLE='%s'\n", title);
-    printf("ARTIST='%s'\n", artist);
-    printf("ALBUM='%s'\n", album);
-    printf("COMMENT='%s'\n", comment);
-    printf("GENRE='%s'\n", genre);
-    printf("YEAR=%d\n", taglib_tag_year(tags));
-    printf("TRACK=%d\n", taglib_tag_track(tags));
+
+    printf("%sTITLE='%s'\n", prefix, title);
+    printf("%sARTIST='%s'\n", prefix, artist);
+    printf("%sALBUM='%s'\n", prefix, album);
+    printf("%sCOMMENT='%s'\n", prefix, comment);
+    printf("%sGENRE='%s'\n", prefix, genre);
+    printf("%sYEAR=%d\n", prefix, taglib_tag_year(tags));
+    printf("%sTRACK=%d\n", prefix, taglib_tag_track(tags));
 
     // Cleanup
     taglib_tag_free_strings();
@@ -197,10 +203,10 @@ void tprint(TagLib_File *fp) {
 
     // Audio properties
     const TagLib_AudioProperties *props = taglib_file_audioproperties(fp);
-    printf("LENGTH=%d\n", taglib_audioproperties_length(props));
-    printf("BITRATE=%d\n", taglib_audioproperties_bitrate(props));
-    printf("SAMPLERATE=%d\n", taglib_audioproperties_samplerate(props));
-    printf("CHANNELS=%d\n", taglib_audioproperties_channels(props));
+    printf("%sLENGTH=%d\n", prefix, taglib_audioproperties_length(props));
+    printf("%sBITRATE=%d\n", prefix, taglib_audioproperties_bitrate(props));
+    printf("%sSAMPLERATE=%d\n", prefix, taglib_audioproperties_samplerate(props));
+    printf("%sCHANNELS=%d\n", prefix, taglib_audioproperties_channels(props));
 
 }
 
@@ -209,12 +215,13 @@ int main(int argc, char **argv) {
 
     // Parse command line
     int optc;
-    int verbose = 0;
     int set = 0;
     int type = -1;
     int unicode = 1;
     int legal_enc = 0;
 
+    verbose = 0;
+    export = 0;
     static struct option long_options[] = {
         {"version",    no_argument,        NULL, 'V'},
         {"help",       no_argument,        NULL, 'h'},
@@ -222,11 +229,12 @@ int main(int argc, char **argv) {
         {"type",       required_argument,  NULL, 't'},
         {"encoding",   required_argument,  NULL, 'e'},
         {"no-unicode", no_argument,        NULL, 'n'},
+        {"export",     no_argument,        NULL, 'E'},
         {"verbose",    no_argument,        NULL, 'v'},
         {0, 0, NULL, 0}
     };
 
-    while (-1 != (optc = getopt_long(argc, argv, "Vhst:e:nv", long_options, NULL))) {
+    while (-1 != (optc = getopt_long(argc, argv, "Vhst:e:nEv", long_options, NULL))) {
         switch (optc) {
             case 'h':
                 usage();
@@ -262,6 +270,9 @@ int main(int argc, char **argv) {
                 }
             case 'n':
                 unicode = 0;
+                break;
+            case 'E':
+                export = 1;
                 break;
             case 'v':
                 verbose = 1;
