@@ -3,7 +3,7 @@
 # Copyright 2009 Ali Polatel <polatel@gmail.com>
 # Distributed under the terms of the GNU General Public License v2
 
-# Find audio files that don't have a title tag
+# Find audio files that have missing tags
 MUSIC_DIR="${HOME}"/mm/müzik
 
 setopt extended_glob
@@ -11,9 +11,12 @@ autoload -U zargs
 
 function tfilter() {
     for file in "$@"; do
-        unset TITLE
+        unset ARTIST TITLE ALBUM GENRE
         eval `envtag "$file"`
-        [[ -z "${TITLE}" ]] && echo "$file"
+        [[ -z "${ARTIST}" ]] && echo "ARTIST $file" && continue
+        [[ -z "${TITLE}" ]] && echo "TITLE $file" && continue
+        [[ -z "${ALBUM}" ]] && echo "ALBUM $file" && continue
+        [[ -z "${GENRE}" ]] && echo "GENRE $file" && continue
     done
 }
 
