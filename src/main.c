@@ -295,6 +295,7 @@ int main(int argc, char **argv) {
     if (!unicode)
         taglib_set_strings_unicode(0);
 
+    int ret = EXIT_SUCCESS;
     for (int i = 1; i < argc; i++) {
         if (-1 == type)
             fp = taglib_file_new(argv[i]);
@@ -303,11 +304,13 @@ int main(int argc, char **argv) {
 
         if (NULL == fp) {
             lg("Unknown file type: `%s'", argv[i]);
+            ret = EXIT_FAILURE;
             continue;
         }
         else if (!taglib_file_is_valid(fp)) {
             lg("No valid tag information: `%s'", argv[i]);
             taglib_file_free(fp);
+            ret = EXIT_FAILURE;
             continue;
         }
         if (set) {
@@ -320,5 +323,5 @@ int main(int argc, char **argv) {
             tprint(fp);
         taglib_file_free(fp);
     }
-    return EXIT_SUCCESS;
+    return ret;
 }
