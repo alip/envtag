@@ -20,4 +20,4 @@ function tfilter() {
     done
 }
 
-zargs (#iq)"${MUSIC_DIR}"/**/*.(fla|flac|mp3|oga|ogg|spx|tta) -- tfilter
+zargs (#iq)"${MUSIC_DIR}"/**/*.(flac|mp3|ogg|spx|tta) -- tfilter
