@@ -104,7 +104,7 @@ void usage(void) {
 void __lg(const char *func, size_t len, const char *fmt, ...) {
     va_list args;
 
-    fprintf(stderr, PACKAGE"@%ld: [%s():%zu] ", time(NULL), func, len);
+    fprintf(stderr, PACKAGE"@%ld: [%s.%zu] ", time(NULL), func, len);
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
     va_end(args);
