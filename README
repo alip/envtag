@@ -18,3 +18,7 @@ echo "Track: $TRACK"
 * Saving tag information:
 COMMENT="Tagged by envtag" envtag -s *.mp3
 
+* Changing file format preserving tag information
+eval `envtag -E /path/to/audio/file` # exports tag information
+decoder /path/to/audio/file | encoder /path/to/audio/file.new
+envtag -s /path/to/audio/file.new # grabs exported tag information and saves it
