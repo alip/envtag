@@ -340,14 +340,16 @@ int main(int argc, char **argv) {
             continue;
         }
         if (set) {
-            lg("Setting tags of `%s'", argv[i]);
+            if (verbose)
+                lg("Setting tags of `%s'", argv[i]);
             tset(fp);
             if (verbose)
                 tprint(fp);
         }
 #ifdef ENABLE_LUA
         else if (script) {
-            lg("Running script `%s' on `%s'", script, argv[i]);
+            if (verbose)
+                lg("Running script `%s' on `%s'", script, argv[i]);
             if (0 != doscript(script, lstate, fp, argv[i], verbose, i, argc - 1)) {
                 lg("Error running script: %s", lua_tostring(lstate, -1));
                 lua_pop(lstate, 1);
