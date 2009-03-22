@@ -28,9 +28,7 @@
 
 #include <taglib/tag_c.h>
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include "defs.h"
 
 #ifdef ENABLE_LUA
 #include "script.h"
@@ -64,11 +62,6 @@ static struct id3v2_encoding_table {
     {TagLib_ID3v2_UTF8,     "utf8"},
     {-1,                    NULL}
 };
-
-// Prototypes
-void __lg(const char *func, size_t len, const char *fmt, ...)
-    __attribute__ ((format (printf, 3, 4)));
-#define lg(...)     __lg(__func__, __LINE__, __VA_ARGS__)
 
 void about(void) {
     fprintf(stderr, PACKAGE"-"VERSION);
@@ -104,6 +97,8 @@ void usage(void) {
     fprintf(stderr, "\tlatin1, utf16, utf16be, utf8 (default)\n");
     fprintf(stderr, "\nEnvironment variables used in set mode:\n");
     fprintf(stderr, "\tTITLE, ARTIST, ALBUM, COMMENT, GENRE, YEAR, TRACK\n");
+    fprintf(stderr, "\nEnvironment variables used by scripter:\n");
+    fprintf(stderr, "\t"ENV_INIT": Run initialization code or load from file similar to LUA_INIT\n");
 }
 
 void __lg(const char *func, size_t len, const char *fmt, ...) {

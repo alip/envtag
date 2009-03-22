@@ -19,6 +19,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <lua.h>
@@ -26,6 +27,8 @@
 #include <lualib.h>
 
 #include <taglib/tag_c.h>
+
+#include "defs.h"
 
 #include "script.h"
 #define FILE_GLOBAL "__audio_file"
@@ -168,6 +171,23 @@ lua_State *init_lua(void) {
     luaL_register(L, "tag", tag_methods);
     luaL_register(L, "prop", prop_methods);
 
+    /* Initialize using ENV_INIT */
+    char *init = getenv(ENV_INIT);
+    if (NULL != init) {
+        if ('@' == init[0]) {
+            init++;
+            if (0 != luaL_dofile(L, init)) {
+                lg("Error running init script `%s': %s", init, lua_tostring(L, -1));
+                lua_pop(L, 1);
+            }
+        }
+        else {
+            if (0 != luaL_dostring(L, init)) {
+                lg("Error running code from "ENV_INIT": %s", lua_tostring(L, -1));
+                lua_pop(L, 1);
+            }
+        }
+    }
     return L;
 }
 
