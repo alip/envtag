@@ -10,6 +10,10 @@ end
 
 -- The filename is in the global FILE variable
 lprint("Processing " .. FILE)
+-- The global VERBOSE variable is set to true if envtag was invoked with -v
+-- You can use this to make your scripts verbose as needed.
+if VERBOSE then lprint("verbose")
+else lprint("not verbose") end
 
 -- tag.get() function is used to retrieve tags.
 -- It returns the value as string or integer depending on tag.

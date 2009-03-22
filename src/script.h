@@ -24,6 +24,6 @@
 #include <taglib/tag_c.h>
 
 lua_State *init_lua(void);
-int doscript(const char *script, const char *file, lua_State *L, TagLib_File *fp);
+int doscript(const char *script, lua_State *L, TagLib_File *fp, const char *file, int verbose);
 
 #endif /* ENVTAG_GUARD_SCRIPT_H */

@@ -30,6 +30,7 @@
 #include "script.h"
 #define FILE_GLOBAL "__audio_file"
 #define FILENAME_GLOBAL "FILE"
+#define VERBOSE_GLOBAL "VERBOSE"
 
 static int tag_get(lua_State *L) {
     const char *tname = luaL_checkstring(L, 1);
@@ -168,11 +169,13 @@ lua_State *init_lua(void) {
     return L;
 }
 
-int doscript(const char *script, const char *file, lua_State *L, TagLib_File *fp) {
+int doscript(const char *script, lua_State *L, TagLib_File *fp, const char *file, int verbose) {
     lua_pushlightuserdata(L, fp);
     lua_setglobal(L, FILE_GLOBAL);
     lua_pushstring(L, file);
     lua_setglobal(L, FILENAME_GLOBAL);
+    lua_pushboolean(L, verbose);
+    lua_setglobal(L, VERBOSE_GLOBAL);
 
     return luaL_dofile(L, script);
 }
