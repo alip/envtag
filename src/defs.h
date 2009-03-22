@@ -25,6 +25,7 @@
 #endif
 
 #define ENV_INIT "ENVTAG_INIT"
+#define SCRIPT_SEARCH_DIR "/.envtag/lua/"
 
 void __lg(const char *func, size_t len, const char *fmt, ...)
     __attribute__ ((format (printf, 3, 4)));

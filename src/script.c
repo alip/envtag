@@ -21,6 +21,10 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <pwd.h>
+#include <unistd.h>
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -191,7 +195,36 @@ lua_State *init_lua(void) {
     return L;
 }
 
-int doscript(const char *script, lua_State *L, TagLib_File *fp,
+char *getscript(const char *script) {
+    char *home;
+    home = getenv("HOME");
+    if (NULL == home) {
+        uid_t uid;
+        struct passwd *pwd;
+
+        uid = geteuid();
+        errno = 0;
+        pwd = getpwuid(uid);
+
+        if (0 != errno)
+            return NULL;
+        home = pwd->pw_name;
+    }
+
+    char *spath = malloc(strlen(home) + strlen(script) + strlen(SCRIPT_SEARCH_DIR) + 1);
+    if (NULL == spath)
+        return NULL;
+    strcpy(spath, home);
+    strcat(spath, SCRIPT_SEARCH_DIR);
+    strcat(spath, script);
+
+    struct stat buf;
+    if (0 == stat(spath, &buf))
+        return spath;
+    return NULL;
+}
+
+void doscript(const char *script, lua_State *L, TagLib_File *fp,
         const char *file, int verbose, int count, int total) {
     lua_pushlightuserdata(L, fp);
     lua_setglobal(L, FILE_GLOBAL);
@@ -208,5 +241,23 @@ int doscript(const char *script, lua_State *L, TagLib_File *fp,
         // Read from standard input
         script = NULL;
     }
-    return luaL_dofile(L, script);
+    int ret;
+    struct stat buf;
+    if ('/' == script[0] || 0 == stat(script, &buf))
+        ret = luaL_dofile(L, script);
+    else {
+        char *spath = getscript(script);
+        if (NULL != spath) {
+            ret = luaL_dofile(L, spath);
+            free(spath);
+        }
+        else {
+            lg("Failed to find script `%s': %s", script, strerror(errno));
+            return;
+        }
+    }
+    if (0 != ret) {
+        lg("Error running script: %s", lua_tostring(L, -1));
+        lua_pop(L, 1);
+    }
 }

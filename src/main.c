@@ -99,6 +99,8 @@ void usage(void) {
     fprintf(stderr, "\tTITLE, ARTIST, ALBUM, COMMENT, GENRE, YEAR, TRACK\n");
     fprintf(stderr, "\nEnvironment variables used by scripter:\n");
     fprintf(stderr, "\t"ENV_INIT": Run initialization code or load from file similar to LUA_INIT\n");
+    fprintf(stderr, "\nPaths:\n");
+    fprintf(stderr, "\t~"SCRIPT_SEARCH_DIR": Search directory for scripts\n");
 }
 
 void __lg(const char *func, size_t len, const char *fmt, ...) {
@@ -345,10 +347,7 @@ int main(int argc, char **argv) {
         else if (script) {
             if (verbose)
                 lg("Running script `%s' on `%s'", script, argv[i]);
-            if (0 != doscript(script, lstate, fp, argv[i], verbose, i, argc - 1)) {
-                lg("Error running script: %s", lua_tostring(lstate, -1));
-                lua_pop(lstate, 1);
-            }
+            doscript(script, lstate, fp, argv[i], verbose, i, argc - 1);
         }
 #endif
         else
