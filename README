@@ -22,3 +22,6 @@ COMMENT="Tagged by envtag" envtag -s *.mp3
 eval `envtag -E /path/to/audio/file` # exports tag information
 decoder /path/to/audio/file | encoder /path/to/audio/file.new
 envtag -s /path/to/audio/file.new # grabs exported tag information and saves it
+
+* Run script, see examples/lua for example scripts
+envtag -S /path/to/script.lua /path/to/audio/file
