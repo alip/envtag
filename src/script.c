@@ -31,6 +31,8 @@
 #define FILE_GLOBAL "__audio_file"
 #define FILENAME_GLOBAL "FILE"
 #define VERBOSE_GLOBAL "VERBOSE"
+#define COUNT_GLOBAL "COUNT"
+#define TOTAL_GLOBAL "TOTAL"
 
 static int tag_get(lua_State *L) {
     const char *tname = luaL_checkstring(L, 1);
@@ -169,13 +171,18 @@ lua_State *init_lua(void) {
     return L;
 }
 
-int doscript(const char *script, lua_State *L, TagLib_File *fp, const char *file, int verbose) {
+int doscript(const char *script, lua_State *L, TagLib_File *fp,
+        const char *file, int verbose, int count, int total) {
     lua_pushlightuserdata(L, fp);
     lua_setglobal(L, FILE_GLOBAL);
     lua_pushstring(L, file);
     lua_setglobal(L, FILENAME_GLOBAL);
     lua_pushboolean(L, verbose);
     lua_setglobal(L, VERBOSE_GLOBAL);
+    lua_pushinteger(L, count);
+    lua_setglobal(L, COUNT_GLOBAL);
+    lua_pushinteger(L, total);
+    lua_setglobal(L, TOTAL_GLOBAL);
 
     return luaL_dofile(L, script);
 }

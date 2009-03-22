@@ -348,7 +348,7 @@ int main(int argc, char **argv) {
 #ifdef ENABLE_LUA
         else if (script) {
             lg("Running script `%s' on `%s'", script, argv[i]);
-            if (0 != doscript(script, lstate, fp, argv[i], verbose)) {
+            if (0 != doscript(script, lstate, fp, argv[i], verbose, i, argc - 1)) {
                 lg("Error running script: %s", lua_tostring(lstate, -1));
                 lua_pop(lstate, 1);
             }

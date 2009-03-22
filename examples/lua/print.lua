@@ -14,6 +14,10 @@ lprint("Processing " .. FILE)
 -- You can use this to make your scripts verbose as needed.
 if VERBOSE then lprint("verbose")
 else lprint("not verbose") end
+-- The global COUNT variable gives the count of current processed file
+-- The global TOTAL variables gives the total number of files that will be
+-- processed
+lprint("count: " .. COUNT .. " of " .. TOTAL)
 
 -- tag.get() function is used to retrieve tags.
 -- It returns the value as string or integer depending on tag.
