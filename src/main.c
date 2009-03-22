@@ -86,13 +86,13 @@ void usage(void) {
         fprintf(stderr, "-"GITHEAD);
 #endif
     fprintf(stderr, " simple audio tagger for use in shell scripts\n");
-    fprintf(stderr, "Usage: "PACKAGE" [-t type] [-e encoding] [-hVvsnE] file...\n\n");
+    fprintf(stderr, "Usage: "PACKAGE" [-t type] [-e encoding] [-s|-S FILE] [-hVvnE] file...\n\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-h, --help\t\tYou're looking at it :)\n");
     fprintf(stderr, "\t-V, --version\t\tShow version information\n");
     fprintf(stderr, "\t-v, --verbose\t\tBe verbose\n");
     fprintf(stderr, "\t-s, --set\t\tSet tags\n");
-    fprintf(stderr, "\t-S FILE, --script=FILE\tExecute script on tags\n");
+    fprintf(stderr, "\t-S FILE, --script=FILE\tExecute script FILE on tags (use - for stdin)\n");
     fprintf(stderr, "\t-t TYPE, --type=TYPE\tSpecify type\n");
     fprintf(stderr, "\t-e ENC, --encoding=ENC\tSpecify ID3v2 encoding\n");
     fprintf(stderr, "\t-n, --no-unicode\tOperate on Latin1 strings\n");

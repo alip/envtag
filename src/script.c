@@ -184,5 +184,9 @@ int doscript(const char *script, lua_State *L, TagLib_File *fp,
     lua_pushinteger(L, total);
     lua_setglobal(L, TOTAL_GLOBAL);
 
+    if (0 == strncmp(script, "-", 2)) {
+        // Read from standard input
+        script = NULL;
+    }
     return luaL_dofile(L, script);
 }
