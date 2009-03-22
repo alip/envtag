@@ -24,4 +24,17 @@ decoder /path/to/audio/file | encoder /path/to/audio/file.new
 envtag -s /path/to/audio/file.new # grabs exported tag information and saves it
 
 * Run script, see examples/lua for example scripts
-envtag -S /path/to/script.lua /path/to/audio/file
+envtag -S /path/to/script.lua /path/to/audio/file...
+
+* Run script from standard input
+envtag -S - /path/to/audio/file... <<EOF
+print("file: ", FILE)
+print("count: " .. COUNT .. " of " .. TOTAL)
+print("title:", tag.get"title")
+print("artist:", tag.get"artist")
+print("album:", tag.get"album")
+print("genre:", tag.get"genre")
+print("year:", tag.get"year")
+print("track", tag.get"track")
+print("comment:", tag.get"comment")
+EOF
