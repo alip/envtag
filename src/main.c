@@ -247,7 +247,7 @@ int main(int argc, char **argv) {
                 break;
             case 't':
                 for (int i = 0; types[i].name != NULL; i++) {
-                    if (0 == strncmp(optarg, types[i].name, strlen(types[i].name)))
+                    if (0 == strncmp(optarg, types[i].name, strlen(types[i].name) + 1))
                         type = types[i].no;
                 }
                 if (-1 == type) {
@@ -257,7 +257,7 @@ int main(int argc, char **argv) {
                 break;
             case 'e':
                 for (int i = 0; id3v2_encodings[i].name != NULL; i++) {
-                    if (0 == strncmp(optarg, id3v2_encodings[i].name, strlen(id3v2_encodings[i].name)))
+                    if (0 == strncmp(optarg, id3v2_encodings[i].name, strlen(id3v2_encodings[i].name) + 1))
                     {
                         legal_enc = 1;
                         taglib_id3v2_set_default_text_encoding(id3v2_encodings[i].no);
