@@ -45,6 +45,22 @@ PKG_CHECK_MODULES([taglib_c], [taglib_c],,
 				  [AC_MSG_ERROR([envtag requires taglib c bindings])])
 dnl }}}
 
+dnl {{{ check for Lua support
+AC_MSG_CHECKING([whether to enable Lua scripting support])
+AC_ARG_ENABLE([lua],
+			  AS_HELP_STRING([--enable-lua], [Enable Lua scripting support]),
+			  [enable_lua=$enableval],
+			  [enable_lua=no])
+AC_MSG_RESULT([$enable_lua])
+
+AM_CONDITIONAL(LUA, test x"$enable_lua" = x"yes")
+if test x"$enable_lua" = x"yes"; then
+	PKG_CHECK_MODULES([lua], [lua >= 5.1],,
+					  [AC_MSG_ERROR([Lua support requires lua-5.1 or newer])])
+	AC_DEFINE([ENABLE_LUA], [1], [Enable Lua support])
+fi
+dnl }}}
+
 dnl {{{ extra cflags for gcc
 ENVTAG_CFLAGS=
 if test x"$GCC" = x"yes"; then
@@ -59,5 +75,6 @@ AC_OUTPUT(
 		  Makefile
 		  src/Makefile
 		  examples/Makefile
+		  examples/lua/Makefile
 		  )
 dnl }}}

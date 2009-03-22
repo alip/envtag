@@ -32,6 +32,10 @@
 #include "config.h"
 #endif
 
+#ifdef ENABLE_LUA
+#include "script.h"
+#endif
+
 static int verbose;
 static int export;
 
@@ -88,6 +92,7 @@ void usage(void) {
     fprintf(stderr, "\t-V, --version\t\tShow version information\n");
     fprintf(stderr, "\t-v, --verbose\t\tBe verbose\n");
     fprintf(stderr, "\t-s, --set\t\tSet tags\n");
+    fprintf(stderr, "\t-S FILE, --script=FILE\tExecute script on tags\n");
     fprintf(stderr, "\t-t TYPE, --type=TYPE\tSpecify type\n");
     fprintf(stderr, "\t-e ENC, --encoding=ENC\tSpecify ID3v2 encoding\n");
     fprintf(stderr, "\t-n, --no-unicode\tOperate on Latin1 strings\n");
@@ -216,6 +221,7 @@ int main(int argc, char **argv) {
     // Parse command line
     int optc;
     int set = 0;
+    char *script = NULL;
     int type = -1;
     int unicode = 1;
     int legal_enc = 0;
@@ -226,6 +232,7 @@ int main(int argc, char **argv) {
         {"version",    no_argument,        NULL, 'V'},
         {"help",       no_argument,        NULL, 'h'},
         {"set",        no_argument,        NULL, 's'},
+        {"script",     required_argument,  NULL, 'S'},
         {"type",       required_argument,  NULL, 't'},
         {"encoding",   required_argument,  NULL, 'e'},
         {"no-unicode", no_argument,        NULL, 'n'},
@@ -234,7 +241,7 @@ int main(int argc, char **argv) {
         {0, 0, NULL, 0}
     };
 
-    while (-1 != (optc = getopt_long(argc, argv, "Vhst:e:nEv", long_options, NULL))) {
+    while (-1 != (optc = getopt_long(argc, argv, "VhsS:t:e:nEv", long_options, NULL))) {
         switch (optc) {
             case 'h':
                 usage();
@@ -245,6 +252,14 @@ int main(int argc, char **argv) {
             case 's':
                 set = 1;
                 break;
+            case 'S':
+#ifdef ENABLE_LUA
+                script = optarg;
+                break;
+#else
+                lg("-S/--script requires Lua support enabled");
+                return EX_USAGE;
+#endif
             case 't':
                 for (int i = 0; types[i].name != NULL; i++) {
                     if (0 == strncmp(optarg, types[i].name, strlen(types[i].name) + 1))
@@ -283,6 +298,11 @@ int main(int argc, char **argv) {
                 return EXIT_FAILURE;
         }
     }
+    if (set && script) {
+        lg("Options -s and -S are mutually exclusive");
+        return EX_USAGE;
+    }
+
     if (argc < optind + 1) {
         lg("No file given");
         return EXIT_FAILURE;
@@ -294,6 +314,12 @@ int main(int argc, char **argv) {
 
     if (!unicode)
         taglib_set_strings_unicode(0);
+
+#ifdef ENABLE_LUA
+    lua_State *lstate = NULL;
+    if (script)
+        lstate = init_lua();
+#endif
 
     int ret = EXIT_SUCCESS;
     for (int i = 1; i < argc; i++) {
@@ -319,9 +345,24 @@ int main(int argc, char **argv) {
             if (verbose)
                 tprint(fp);
         }
+#ifdef ENABLE_LUA
+        else if (script) {
+            lg("Running script `%s' on `%s'", script, argv[i]);
+            if (0 != doscript(script, argv[i], lstate, fp)) {
+                lg("Error running script: %s", lua_tostring(lstate, -1));
+                lua_pop(lstate, 1);
+            }
+            if (verbose)
+                tprint(fp);
+        }
+#endif
         else
             tprint(fp);
         taglib_file_free(fp);
     }
+#ifdef ENABLE_LUA
+    if (script)
+        lua_close(lstate);
+#endif
     return ret;
 }
