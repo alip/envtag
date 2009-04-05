@@ -84,7 +84,7 @@ void usage(void) {
         cerr << "-"GITHEAD;
 #endif
     cerr << " simple audio tagger for use in shell scripts\n";
-    cerr << "Usage: "PACKAGE" [-t type] [-e encoding] [-s|-S FILE] [-hVvpnE] file...\n\n";
+    cerr << "Usage: "PACKAGE" [-t type] [-e encoding] [-s|-S FILE/-] [-hVvpnE] file...\n\n";
     cerr << "Options:\n";
     cerr << "\t-h, --help\t\tYou're looking at it :)\n";
     cerr << "\t-V, --version\t\tShow version information\n";
@@ -98,7 +98,11 @@ void usage(void) {
     cerr << "\t-E, --export\t\tPrepend tag lines with export\n";
     cerr << "\nTypes:\n";
     cerr << "\tmpeg, vorbis, flac, mpc, oggflac, wavpack, speex, trueaudio\n";
+#ifdef ENABLE_MAGIC
+    cerr << "\tIf no type is given, "PACKAGE" tries to determine it using libmagic and then using filename\n";
+#else
     cerr << "\tIf no type is given, "PACKAGE" tries to determine it using filename\n";
+#endif
     cerr << "\nPossible ID3v2 encoding values:\n";
     cerr << "\tlatin1, utf16, utf16be, utf8 (default)\n";
     cerr << "\nEnvironment variables used in set mode:\n";
