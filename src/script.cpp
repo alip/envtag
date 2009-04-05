@@ -46,16 +46,17 @@
 
 using namespace std;
 
-#define FILE_GLOBAL "__audio_file"
-#define FILENAME_GLOBAL "FILE"
-#define VERBOSE_GLOBAL "VERBOSE"
-#define COUNT_GLOBAL "COUNT"
-#define TOTAL_GLOBAL "TOTAL"
+static TagLib::FileRef *getfp(lua_State *L)
+{
+    lua_getglobal(L, "file");
+    lua_pushliteral(L, "udata");
+    lua_gettable(L, -2);
+    return (TagLib::FileRef *) lua_touserdata(L, -1);
+}
 
 static int file_type(lua_State *L)
 {
-    lua_getglobal(L, FILE_GLOBAL);
-    TagLib::FileRef *f = (TagLib::FileRef *) lua_touserdata(L, 1);
+    TagLib::FileRef *f = getfp(L);
 
     if (!f) {
         lua_pushnil(L);
@@ -89,10 +90,7 @@ static int tag_get(lua_State *L)
 {
     const char *tname = luaL_checkstring(L, 1);
     bool unicode = lua_toboolean(L, 2);
-    int findex = lua_isnone(L, 2) ? 2 : 3;
-
-    lua_getglobal(L, FILE_GLOBAL);
-    TagLib::FileRef *f = (TagLib::FileRef *) lua_touserdata(L, findex);
+    TagLib::FileRef *f = getfp(L);
 
     if (!f) {
         lua_pushnil(L);
@@ -138,8 +136,7 @@ static int tag_set(lua_State *L)
     else
         tval = luaL_checkstring(L, 2);
 
-    lua_getglobal(L, FILE_GLOBAL);
-    TagLib::FileRef *f = (TagLib::FileRef *) lua_touserdata(L, 3);
+    TagLib::FileRef *f = getfp(L);
 
     if (!f) {
         lua_pushnil(L);
@@ -176,9 +173,7 @@ static int tag_set(lua_State *L)
 static int prop_get(lua_State *L)
 {
     const char *pname = luaL_checkstring(L, 1);
-
-    lua_getglobal(L, FILE_GLOBAL);
-    TagLib::FileRef *f = (TagLib::FileRef *) lua_touserdata(L, 2);
+    TagLib::FileRef *f = getfp(L);
 
     if (!f) {
         lua_pushnil(L);
@@ -225,9 +220,17 @@ lua_State *init_lua(void)
 {
     lua_State *L = lua_open();
     luaL_openlibs(L);
+
+    // Modules
     luaL_register(L, "file", file_methods);
     luaL_register(L, "tag", tag_methods);
     luaL_register(L, "prop", prop_methods);
+
+    // Tables
+    lua_newtable(L);
+    lua_setglobal(L, "opt");
+    lua_newtable(L);
+    lua_setglobal(L, "loop");
 
     // Initialize using ENV_INIT
     char *init = getenv(ENV_INIT);
@@ -281,16 +284,29 @@ void doscript(const char *script, lua_State *L, TagLib::FileRef *f,
     int ret;
     struct stat buf;
 
+    lua_getglobal(L, "file");
+    lua_pushliteral(L, "udata");
     lua_pushlightuserdata(L, f);
-    lua_setglobal(L, FILE_GLOBAL);
+    lua_settable(L, -3);
+    lua_pushliteral(L, "name");
     lua_pushstring(L, file);
-    lua_setglobal(L, FILENAME_GLOBAL);
+    lua_settable(L, -3);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "opt");
+    lua_pushliteral(L, "verbose");
     lua_pushboolean(L, verbose);
-    lua_setglobal(L, VERBOSE_GLOBAL);
+    lua_settable(L, -3);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "loop");
+    lua_pushliteral(L, "count");
     lua_pushinteger(L, count);
-    lua_setglobal(L, COUNT_GLOBAL);
+    lua_settable(L, -3);
+    lua_pushliteral(L, "total");
     lua_pushinteger(L, total);
-    lua_setglobal(L, TOTAL_GLOBAL);
+    lua_settable(L, -3);
+    lua_pop(L, 1);
 
     if (0 == strncmp(script, "-", 2)) {
         // Read from standard input
