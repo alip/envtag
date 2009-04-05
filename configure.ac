@@ -38,10 +38,18 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 dnl }}}
 
-dnl {{{ check for taglib
+dnl {{{ Make pkg-config work
 PKG_PROG_PKG_CONFIG([0.9.0])
+dnl }}}
+
+dnl {{{ check for taglib
 PKG_CHECK_MODULES([taglib], [taglib >= 1.5],,
 				  [AC_MSG_ERROR([envtag requires taglib-1.5 or newer])])
+dnl }}}
+
+dnl {{{ check for Lua
+PKG_CHECK_MODULES([lua], [lua >= 5.1],,
+				  [AC_MSG_ERROR([envtag requires lua-5.1 or newer])])
 dnl }}}
 
 dnl {{{ check for libmagic support
@@ -61,22 +69,6 @@ if test x"$enable_magic" = x"yes"; then
 fi
 dnl }}}
 
-dnl {{{ check for Lua support
-AC_MSG_CHECKING([whether to enable Lua scripting support])
-AC_ARG_ENABLE([lua],
-			  AS_HELP_STRING([--enable-lua], [Enable Lua scripting support]),
-			  [enable_lua=$enableval],
-			  [enable_lua=no])
-AC_MSG_RESULT([$enable_lua])
-
-AM_CONDITIONAL(LUA, test x"$enable_lua" = x"yes")
-if test x"$enable_lua" = x"yes"; then
-	PKG_CHECK_MODULES([lua], [lua >= 5.1],,
-					  [AC_MSG_ERROR([Lua support requires lua-5.1 or newer])])
-	AC_DEFINE([ENABLE_LUA], [1], [Enable Lua support])
-fi
-dnl }}}
-
 dnl {{{ extra cflags for gcc
 ENVTAG_CXXFLAGS=
 if test x"$GCC" = x"yes"; then
@@ -90,6 +82,7 @@ AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(
 		  Makefile
 		  src/Makefile
+		  src/scripts/Makefile
 		  examples/Makefile
 		  examples/lua/Makefile
 		  )

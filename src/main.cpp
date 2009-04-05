@@ -28,15 +28,12 @@
 #include <tag.h>
 
 #include "defs.hh"
+#include "script.hh"
 #include "util.hh"
 
 #ifdef ENABLE_MAGIC
 #include "mime.hh"
 #endif // ENABLE_MAGIC
-
-#ifdef ENABLE_LUA
-#include "script.hh"
-#endif //ENABLE_LUA
 
 using std::cerr;
 using std::cout;
@@ -185,13 +182,8 @@ int main(int argc, char **argv)
                 }
                 break;
             case 'S':
-#ifdef ENABLE_LUA
                 script = optarg;
                 break;
-#else
-                cerr << PACKAGE": -S/--script requires Lua support enabled!" << endl;
-                return EX_USAGE;
-#endif
             case '?':
             default:
                 cerr << "try "PACKAGE" --help for more information" << endl;
@@ -219,47 +211,36 @@ int main(int argc, char **argv)
     TagLib::FileRef::addFileTypeResolver(new MagicFileTypeResolver);
 #endif
 
-#ifdef ENABLE_LUA
-    lua_State *lstate = NULL;
-    if (script)
-        lstate = init_lua();
-#endif
-
     int ret = EXIT_SUCCESS;
+    lua_State *lstate = init_lua();
     TagLib::FileRef *f = 0;
     for (int i = 1; i < argc; i++) {
         if (f) delete f;
         f = openFile(argv[i], type);
         if (f && !f->isNull()) {
             if (set_tags) {
-                if (verbose)
-                    cerr << PACKAGE": setting tags of `" << argv[i] << "'" << endl;
-                if (!setTags(*f, unicode)) {
+                if (dobuiltin("set", lstate, f, argv[i], unicode, export_vars, verbose, i, argc - 1)) {
                     ret = EXIT_FAILURE;
-                    cerr << PACKAGE": failed to write tags to `" << argv[i] << "'" << endl;
                     continue;
                 }
                 if (!print_tags)
                     continue;
             }
-#ifdef ENABLE_LUA
             else if (script) {
-                doscript(script, lstate, f, argv[i], verbose, i, argc - 1);
+                if (doscript(script, lstate, f, argv[i], unicode, export_vars, verbose, i, argc - 1)) {
+                    ret = EXIT_FAILURE;
+                    continue;
+                }
                 if (!print_tags)
                     continue;
             }
-#endif
-            dumpTags(*f, export_vars);
-            dumpProperties(*f, export_vars);
+            dobuiltin("print", lstate, f, argv[i], unicode, export_vars, verbose, i, argc - 1);
         }
         else {
             ret = EXIT_FAILURE;
             cerr << PACKAGE": unknown file type `" << argv[i] << "'" << endl;
         }
     }
-#ifdef ENABLE_LUA
-    if (lstate)
-        lua_close(lstate);
-#endif
+    lua_close(lstate);
     return ret;
 }

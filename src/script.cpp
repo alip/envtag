@@ -54,6 +54,20 @@ static TagLib::FileRef *getfp(lua_State *L)
     return (TagLib::FileRef *) lua_touserdata(L, -1);
 }
 
+static int file_save(lua_State *L)
+{
+    TagLib::FileRef *f = getfp(L);
+
+    if (!f) {
+        lua_pushnil(L);
+        lua_pushstring(L, "no audio file");
+        return 2;
+    }
+
+    lua_pushboolean(L, f->save());
+    return 1;
+}
+
 static int file_type(lua_State *L)
 {
     TagLib::FileRef *f = getfp(L);
@@ -166,8 +180,7 @@ static int tag_set(lua_State *L)
         tag->setTrack(tnum);
     else
         return luaL_argerror(L, 1, "invalid tag");
-    lua_pushboolean(L, f->save());
-    return 1;
+    return 0;
 }
 
 static int prop_get(lua_State *L)
@@ -201,6 +214,7 @@ static int prop_get(lua_State *L)
 }
 
 static const struct luaL_reg file_methods[] = {
+    {"save", file_save},
     {"type", file_type},
     {NULL, NULL}
 };
@@ -278,12 +292,10 @@ string getscript(const char *script)
     return string("");
 }
 
-void doscript(const char *script, lua_State *L, TagLib::FileRef *f,
-        const char *file, bool verbose, int count, int total)
+static void initscript(lua_State *L, TagLib::FileRef *f,
+        const char *file, bool unicode, bool export_vars, bool verbose,
+        int count, int total)
 {
-    int ret;
-    struct stat buf;
-
     lua_getglobal(L, "file");
     lua_pushliteral(L, "udata");
     lua_pushlightuserdata(L, f);
@@ -294,6 +306,12 @@ void doscript(const char *script, lua_State *L, TagLib::FileRef *f,
     lua_pop(L, 1);
 
     lua_getglobal(L, "opt");
+    lua_pushliteral(L, "unicode");
+    lua_pushboolean(L, unicode);
+    lua_settable(L, -3);
+    lua_pushliteral(L, "export");
+    lua_pushboolean(L, export_vars);
+    lua_settable(L, -3);
     lua_pushliteral(L, "verbose");
     lua_pushboolean(L, verbose);
     lua_settable(L, -3);
@@ -313,7 +331,26 @@ void doscript(const char *script, lua_State *L, TagLib::FileRef *f,
     lua_pushboolean(L, total == count ? 1 : 0);
     lua_settable(L, -3);
     lua_pop(L, 1);
+}
 
+int dobuiltin(const char *name, lua_State *L, TagLib::FileRef *f,
+        const char *file, bool unicode, bool export_vars, bool verbose,
+        int count, int total)
+{
+    string script = string(name);
+    script = LIBEXECDIR"/"PACKAGE"/" + script + ".lua";
+
+    return doscript(script.c_str(), L, f, file, unicode, export_vars, verbose, count, total);
+}
+
+int doscript(const char *script, lua_State *L, TagLib::FileRef *f,
+        const char *file, bool unicode, bool export_vars, bool verbose,
+        int count, int total)
+{
+    int ret;
+    struct stat buf;
+
+    initscript(L, f, file, unicode, export_vars, verbose, count, total);
     if (0 == strncmp(script, "-", 2)) {
         // Read from standard input
         script = NULL;
@@ -327,11 +364,12 @@ void doscript(const char *script, lua_State *L, TagLib::FileRef *f,
             ret = luaL_dofile(L, script_path.c_str());
         else {
             cerr << PACKAGE": failed to find script `" << script << "'" << endl;
-            return;
+            return 1;
         }
     }
     if (0 != ret) {
         cerr << PACKAGE": error running script: " << lua_tostring(L, -1) << endl;
         lua_pop(L, 1);
     }
+    return ret;
 }
