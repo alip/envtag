@@ -1,7 +1,7 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
 
 /*
- * Copyright (c) 2009 Ali Polatel
+ * Copyright (c) 2009 Ali Polatel <polatel@gmail.com>
  *
  * This file is part of the envtag audio tagger. envtag is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -17,14 +17,14 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef ENVTAG_GUARD_SCRIPT_H
-#define ENVTAG_GUARD_SCRIPT_H 1
+#ifndef ENVTAG_GUARD_DEFS_HH
+#define ENVTAG_GUARD_DEFS_HH 1
 
-#include <lua.h>
-#include <taglib/tag_c.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-lua_State *init_lua(void);
-void doscript(const char *script, lua_State *L, TagLib_File *fp,
-        const char *file, int verbose, int count, int total);
+#define ENV_INIT "ENVTAG_INIT"
+#define SCRIPT_SEARCH_DIR "/.envtag/lua/"
 
-#endif /* ENVTAG_GUARD_SCRIPT_H */
+#endif /* ENVTAG_GUARD_DEFS_HH */

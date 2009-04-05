@@ -2,7 +2,7 @@ dnl vim: set sw=4 sts=4 ts=4 noet ft=config foldmethod=marker foldmarker={{{,}}}
 
 dnl {{{ program, version
 AC_PREREQ(2.59)
-AC_INIT([src/main.c])
+AC_INIT([src/main.cpp])
 
 VERSION_MAJOR=0
 VERSION_MINOR=2
@@ -32,17 +32,31 @@ dnl }}}
 dnl }}}
 
 dnl {{{ toolchain checks
-AC_PROG_CC_C99
-if test x"$ac_cv_prog_cc_c99" = x"no"; then
-	AC_MSG_ERROR([envtag requires a C compiler that supports ISO C99!])
-fi
+AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 dnl }}}
 
-dnl {{{ check for taglib c bindings
-PKG_CHECK_MODULES([taglib_c], [taglib_c],,
-				  [AC_MSG_ERROR([envtag requires taglib c bindings])])
+dnl {{{ check for taglib
+PKG_CHECK_MODULES([taglib], [taglib >= 1.5],,
+				  [AC_MSG_ERROR([envtag requires taglib-1.5 or newer])])
+dnl }}}
+
+dnl {{{ check for libmagic support
+AC_MSG_CHECKING([whether to enable libmagic support])
+AC_ARG_ENABLE([libmagic],
+			  AS_HELP_STRING([--enable-libmagic], [Enable libmagic support]),
+			  [enable_magic=$enableval],
+			  [enable_magic=no])
+AC_MSG_RESULT([$enable_magic])
+
+AM_CONDITIONAL(MAGIC, test x"$enable_magic" = x"yes")
+if test x"$enable_magic" = x"yes"; then
+	AC_CHECK_LIB(magic, magic_open)
+	AC_CHECK_HEADERS(magic.h,,
+					 [AC_MSG_ERROR([magic.h is required for libmagic support])])
+	AC_DEFINE([ENABLE_MAGIC], [1], [Enable libmagic support])
+fi
 dnl }}}
 
 dnl {{{ check for Lua support
@@ -62,11 +76,11 @@ fi
 dnl }}}
 
 dnl {{{ extra cflags for gcc
-ENVTAG_CFLAGS=
+ENVTAG_CXXFLAGS=
 if test x"$GCC" = x"yes"; then
-	ENVTAG_CFLAGS="$ENVTAG_CFLAGS -Wall -pedantic"
+	ENVTAG_CXXFLAGS="$ENVTAG_CXXFLAGS -Wall"
 fi
-AC_SUBST([ENVTAG_CFLAGS])
+AC_SUBST([ENVTAG_CXXFLAGS])
 dnl }}}
 
 dnl {{{ output

@@ -1,7 +1,7 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
 
 /*
- * Copyright (c) 2009 Ali Polatel
+ * Copyright (c) 2009 Ali Polatel <polatel@gmail.com>
  *
  * This file is part of the envtag audio tagger. envtag is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -17,70 +17,73 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <assert.h>
+#include <iostream>
+
+#include <cstdlib>
+#include <cstring>
 #include <errno.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <pwd.h>
 #include <unistd.h>
+#include <pwd.h>
 
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+#include <lua.hpp>
+#include <fileref.h>
+#include <tag.h>
 
-#include <taglib/tag_c.h>
+#include "defs.hh"
+#include "script.hh"
 
-#include "defs.h"
+using namespace std;
 
-#include "script.h"
 #define FILE_GLOBAL "__audio_file"
 #define FILENAME_GLOBAL "FILE"
 #define VERBOSE_GLOBAL "VERBOSE"
 #define COUNT_GLOBAL "COUNT"
 #define TOTAL_GLOBAL "TOTAL"
 
-static int tag_get(lua_State *L) {
+static int tag_get(lua_State *L)
+{
     const char *tname = luaL_checkstring(L, 1);
+    bool unicode = lua_toboolean(L, 2);
+    int findex = lua_isnone(L, 2) ? 2 : 3;
 
     lua_getglobal(L, FILE_GLOBAL);
-    TagLib_File *fp = (TagLib_File *) lua_touserdata(L, 2);
+    TagLib::FileRef *f = (TagLib::FileRef *) lua_touserdata(L, findex);
 
-    /* Clean the stack */
-    lua_pop(L, 2);
-
-    if (NULL == fp) {
+    if (!f) {
         lua_pushnil(L);
-        lua_pushstring(L, "audio file not available");
+        lua_pushstring(L, "no audio file");
         return 2;
     }
-    TagLib_Tag *tags = taglib_file_tag(fp);
-
-    if (0 == strncmp(tname, "title", 6))
-        lua_pushstring(L, taglib_tag_title(tags));
-    else if (0 == strncmp(tname, "artist", 7))
-        lua_pushstring(L, taglib_tag_artist(tags));
-    else if (0 == strncmp(tname, "album", 6))
-        lua_pushstring(L, taglib_tag_album(tags));
-    else if (0 == strncmp(tname, "comment", 8))
-        lua_pushstring(L, taglib_tag_comment(tags));
-    else if (0 == strncmp(tname, "genre", 6))
-        lua_pushstring(L, taglib_tag_genre(tags));
-    else if (0 == strncmp(tname, "year", 5))
-        lua_pushinteger(L, taglib_tag_year(tags));
-    else if (0 == strncmp(tname, "track", 6))
-        lua_pushinteger(L, taglib_tag_track(tags));
-    else {
-        taglib_tag_free_strings();
-        return luaL_argerror(L, 2, "invalid tag");
+    else if (!f->tag()) {
+        lua_pushnil(L);
+        lua_pushstring(L, "failed to get tags");
+        return 2;
     }
 
-    taglib_tag_free_strings();
+    TagLib::Tag *tag = f->tag();
+    if (0 == strncmp(tname, "title", 6))
+        lua_pushstring(L, tag->title().toCString(unicode));
+    else if (0 == strncmp(tname, "artist", 7))
+        lua_pushstring(L, tag->artist().toCString(unicode));
+    else if (0 == strncmp(tname, "album", 6))
+        lua_pushstring(L, tag->album().toCString(unicode));
+    else if (0 == strncmp(tname, "comment", 8))
+        lua_pushstring(L, tag->comment().toCString(unicode));
+    else if (0 == strncmp(tname, "genre", 6))
+        lua_pushstring(L, tag->genre().toCString(unicode));
+    else if (0 == strncmp(tname, "year", 5))
+        lua_pushinteger(L, tag->year());
+    else if (0 == strncmp(tname, "track", 6))
+        lua_pushinteger(L, tag->track());
+    else
+        return luaL_argerror(L, 1, "invalid tag");
     return 1;
 }
 
-static int tag_set(lua_State *L) {
+static int tag_set(lua_State *L)
+{
     const char *tname = luaL_checkstring(L, 1);
 
     int tnum = 0;
@@ -93,66 +96,67 @@ static int tag_set(lua_State *L) {
         tval = luaL_checkstring(L, 2);
 
     lua_getglobal(L, FILE_GLOBAL);
-    TagLib_File *fp = (TagLib_File *) lua_touserdata(L, 3);
+    TagLib::FileRef *f = (TagLib::FileRef *) lua_touserdata(L, 3);
 
-    /* Clean the stack */
-    lua_pop(L, 3);
-
-    if (NULL == fp) {
+    if (!f) {
         lua_pushnil(L);
-        lua_pushstring(L, "audio file not available");
+        lua_pushstring(L, "no audio file");
         return 2;
     }
-    TagLib_Tag *tags = taglib_file_tag(fp);
-
-    if (0 == strncmp(tname, "title", 6))
-        taglib_tag_set_title(tags, tval);
-    else if (0 == strncmp(tname, "artist", 7))
-        taglib_tag_set_artist(tags, tval);
-    else if (0 == strncmp(tname, "album", 6))
-        taglib_tag_set_album(tags, tval);
-    else if (0 == strncmp(tname, "comment", 8))
-        taglib_tag_set_comment(tags, tval);
-    else if (0 == strncmp(tname, "genre", 6))
-        taglib_tag_set_genre(tags, tval);
-    else if (0 == strncmp(tname, "year", 5))
-        taglib_tag_set_year(tags, tnum);
-    else if (0 == strncmp(tname, "track", 6))
-        taglib_tag_set_track(tags, tnum);
-    else {
-        taglib_tag_free_strings();
-        return luaL_argerror(L, 2, "invalid tag");
+    else if (!f->tag()) {
+        lua_pushnil(L);
+        lua_pushstring(L, "failed to get tags");
+        return 2;
     }
 
-    taglib_file_save(fp);
-    taglib_tag_free_strings();
+    TagLib::Tag *tag = f->tag();
+    if (0 == strncmp(tname, "title", 6))
+        tag->setTitle(tval);
+    else if (0 == strncmp(tname, "artist", 7))
+        tag->setArtist(tval);
+    else if (0 == strncmp(tname, "album", 6))
+        tag->setAlbum(tval);
+    else if (0 == strncmp(tname, "comment", 8))
+        tag->setComment(tval);
+    else if (0 == strncmp(tname, "genre", 6))
+        tag->setGenre(tval);
+    else if (0 == strncmp(tname, "year", 5))
+        tag->setYear(tnum);
+    else if (0 == strncmp(tname, "track", 6))
+        tag->setTrack(tnum);
+    else
+        return luaL_argerror(L, 1, "invalid tag");
+    lua_pushboolean(L, f->save());
     return 1;
 }
 
-static int prop_get(lua_State *L) {
+static int prop_get(lua_State *L)
+{
     const char *pname = luaL_checkstring(L, 1);
 
     lua_getglobal(L, FILE_GLOBAL);
-    TagLib_File *fp = (TagLib_File *) lua_touserdata(L, 2);
+    TagLib::FileRef *f = (TagLib::FileRef *) lua_touserdata(L, 2);
 
-    /* Clean the stack */
-    lua_pop(L, 2);
-
-    if (NULL == fp) {
+    if (!f) {
         lua_pushnil(L);
-        lua_pushstring(L, "audio file not available");
+        lua_pushstring(L, "no audio file");
         return 2;
     }
-    const TagLib_AudioProperties *props = taglib_file_audioproperties(fp);
+    else if (!f->audioProperties()) {
+        lua_pushnil(L);
+        lua_pushstring(L, "failed to get audio properties");
+        return 2;
+    }
 
+    TagLib::AudioProperties *props = f->audioProperties();
     if (0 == strncmp(pname, "length", 7))
-        lua_pushinteger(L, taglib_audioproperties_length(props));
+        lua_pushinteger(L, props->length());
     else if (0 == strncmp(pname, "bitrate", 8))
-        lua_pushinteger(L, taglib_audioproperties_bitrate(props));
+        lua_pushinteger(L, props->bitrate());
     else if (0 == strncmp(pname, "samplerate", 11))
-        lua_pushinteger(L, taglib_audioproperties_samplerate(props));
+        lua_pushinteger(L, props->sampleRate());
     else if (0 == strncmp(pname, "channels", 9))
-        lua_pushinteger(L, taglib_audioproperties_channels(props));
+        lua_pushinteger(L, props->channels());
     else
         return luaL_argerror(L, 1, "invalid audio property");
     return 1;
@@ -169,25 +173,26 @@ static const struct luaL_reg prop_methods[] = {
     {NULL, NULL}
 };
 
-lua_State *init_lua(void) {
+lua_State *init_lua(void)
+{
     lua_State *L = lua_open();
     luaL_openlibs(L);
     luaL_register(L, "tag", tag_methods);
     luaL_register(L, "prop", prop_methods);
 
-    /* Initialize using ENV_INIT */
+    // Initialize using ENV_INIT
     char *init = getenv(ENV_INIT);
     if (NULL != init) {
         if ('@' == init[0]) {
             init++;
             if (0 != luaL_dofile(L, init)) {
-                lg("Error running init script `%s': %s", init, lua_tostring(L, -1));
+                cerr << PACKAGE": error running init script `" << init << "': " << lua_tostring(L, -1) << endl;
                 lua_pop(L, 1);
             }
         }
         else {
             if (0 != luaL_dostring(L, init)) {
-                lg("Error running code from "ENV_INIT": %s", lua_tostring(L, -1));
+                cerr << PACKAGE": error running code from "ENV_INIT": " << lua_tostring(L, -1) << endl;
                 lua_pop(L, 1);
             }
         }
@@ -195,9 +200,10 @@ lua_State *init_lua(void) {
     return L;
 }
 
-char *getscript(const char *script) {
-    char *home;
-    home = getenv("HOME");
+string getscript(const char *script)
+{
+    string script_path = "";
+    char *home = getenv("HOME");
     if (NULL == home) {
         uid_t uid;
         struct passwd *pwd;
@@ -210,23 +216,23 @@ char *getscript(const char *script) {
             return NULL;
         home = pwd->pw_name;
     }
-
-    char *spath = malloc(strlen(home) + strlen(script) + strlen(SCRIPT_SEARCH_DIR) + 1);
-    if (NULL == spath)
-        return NULL;
-    strcpy(spath, home);
-    strcat(spath, SCRIPT_SEARCH_DIR);
-    strcat(spath, script);
+    script_path += home;
+    script_path += SCRIPT_SEARCH_DIR;
+    script_path += script;
 
     struct stat buf;
-    if (0 == stat(spath, &buf))
-        return spath;
-    return NULL;
+    if (0 == stat(script_path.c_str(), &buf))
+        return script_path;
+    return string("");
 }
 
-void doscript(const char *script, lua_State *L, TagLib_File *fp,
-        const char *file, int verbose, int count, int total) {
-    lua_pushlightuserdata(L, fp);
+void doscript(const char *script, lua_State *L, TagLib::FileRef *f,
+        const char *file, bool verbose, int count, int total)
+{
+    int ret;
+    struct stat buf;
+
+    lua_pushlightuserdata(L, f);
     lua_setglobal(L, FILE_GLOBAL);
     lua_pushstring(L, file);
     lua_setglobal(L, FILENAME_GLOBAL);
@@ -241,23 +247,20 @@ void doscript(const char *script, lua_State *L, TagLib_File *fp,
         // Read from standard input
         script = NULL;
     }
-    int ret;
-    struct stat buf;
+
     if ('/' == script[0] || 0 == stat(script, &buf))
         ret = luaL_dofile(L, script);
     else {
-        char *spath = getscript(script);
-        if (NULL != spath) {
-            ret = luaL_dofile(L, spath);
-            free(spath);
-        }
+        string script_path = getscript(script);
+        if (0 != script_path.compare(""))
+            ret = luaL_dofile(L, script_path.c_str());
         else {
-            lg("Failed to find script `%s': %s", script, strerror(errno));
+            cerr << PACKAGE": failed to find script `" << script << "'" << endl;
             return;
         }
     }
     if (0 != ret) {
-        lg("Error running script: %s", lua_tostring(L, -1));
+        cerr << PACKAGE": error running script: " << lua_tostring(L, -1) << endl;
         lua_pop(L, 1);
     }
 }

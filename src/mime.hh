@@ -1,7 +1,7 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
 
 /*
- * Copyright (c) 2009 Ali Polatel
+ * Copyright (c) 2009 Ali Polatel <polatel@gmail.com>
  *
  * This file is part of the envtag audio tagger. envtag is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -17,18 +17,17 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef ENVTAG_GUARD_DEFS_H
-#define ENVTAG_GUARD_DEFS_H 1
+#ifndef ENVTAG_GUARD_MIME_HH
+#define ENVTAG_GUARD_MIME_HH 1
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <fileref.h>
 
-#define ENV_INIT "ENVTAG_INIT"
-#define SCRIPT_SEARCH_DIR "/.envtag/lua/"
+class MagicFileTypeResolver : public TagLib::FileRef::FileTypeResolver
+{
+    TagLib::File *createFile(TagLib::FileName fileName,
+            bool readAudioProperties,
+            TagLib::AudioProperties::ReadStyle audioPropertiesStyle) const;
+    ~MagicFileTypeResolver() {}
+};
 
-void __lg(const char *func, size_t len, const char *fmt, ...)
-    __attribute__ ((format (printf, 3, 4)));
-#define lg(...)     __lg(__func__, __LINE__, __VA_ARGS__)
-
-#endif /* ENVTAG_GUARD_DEFS_H */
+#endif // ENVTAG_GUARD_MIME_HH
