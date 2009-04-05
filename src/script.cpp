@@ -65,21 +65,21 @@ static int file_type(lua_State *L)
     }
 
     TagLib::File *file = f->file();
-    if (typeid(*file) == typeid(TagLib::MPEG::File))
+    if (dynamic_cast<TagLib::MPEG::File *>(file))
         lua_pushstring(L, "mpeg");
-    else if (typeid(*file) == typeid(TagLib::Ogg::Vorbis::File))
+    else if (dynamic_cast<TagLib::Ogg::Vorbis::File *>(file))
         lua_pushstring(L, "ogg");
-    else if (typeid(*file) == typeid(TagLib::FLAC::File))
+    else if (dynamic_cast<TagLib::FLAC::File *>(file))
         lua_pushstring(L, "flac");
-    else if (typeid(*file) == typeid(TagLib::MPC::File))
+    else if (dynamic_cast<TagLib::MPC::File *>(file))
         lua_pushstring(L, "mpc");
-    else if (typeid(*file) == typeid(TagLib::Ogg::FLAC::File))
+    else if (dynamic_cast<TagLib::Ogg::FLAC::File *>(file))
         lua_pushstring(L, "oggflac");
-    else if (typeid(*file) == typeid(TagLib::WavPack::File))
+    else if (dynamic_cast<TagLib::WavPack::File *>(file))
         lua_pushstring(L, "wavpack");
-    else if (typeid(*file) == typeid(TagLib::Ogg::Speex::File))
+    else if (dynamic_cast<TagLib::Ogg::Speex::File *>(file))
         lua_pushstring(L, "speex");
-    else if (typeid(*file) == typeid(TagLib::TrueAudio::File))
+    else if (dynamic_cast<TagLib::TrueAudio::File *>(file))
         lua_pushstring(L, "trueaudio");
     else
         lua_pushnil(L);
