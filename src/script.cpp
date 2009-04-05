@@ -18,18 +18,28 @@
  */
 
 #include <iostream>
+#include <typeinfo>
 
 #include <cstdlib>
 #include <cstring>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <pwd.h>
+#include <unistd.h>
 
 #include <lua.hpp>
 #include <fileref.h>
 #include <tag.h>
+
+#include <flacfile.h>
+#include <mpcfile.h>
+#include <mpegfile.h>
+#include <oggflacfile.h>
+#include <speexfile.h>
+#include <vorbisfile.h>
+#include <wavpackfile.h>
+#include <trueaudiofile.h>
 
 #include "defs.hh"
 #include "script.hh"
@@ -41,6 +51,39 @@ using namespace std;
 #define VERBOSE_GLOBAL "VERBOSE"
 #define COUNT_GLOBAL "COUNT"
 #define TOTAL_GLOBAL "TOTAL"
+
+static int file_type(lua_State *L)
+{
+    lua_getglobal(L, FILE_GLOBAL);
+    TagLib::FileRef *f = (TagLib::FileRef *) lua_touserdata(L, 1);
+
+    if (!f) {
+        lua_pushnil(L);
+        lua_pushstring(L, "no audio file");
+        return 2;
+    }
+
+    TagLib::File *file = f->file();
+    if (typeid(*file) == typeid(TagLib::MPEG::File))
+        lua_pushstring(L, "mpeg");
+    else if (typeid(*file) == typeid(TagLib::Ogg::Vorbis::File))
+        lua_pushstring(L, "ogg");
+    else if (typeid(*file) == typeid(TagLib::FLAC::File))
+        lua_pushstring(L, "flac");
+    else if (typeid(*file) == typeid(TagLib::MPC::File))
+        lua_pushstring(L, "mpc");
+    else if (typeid(*file) == typeid(TagLib::Ogg::FLAC::File))
+        lua_pushstring(L, "oggflac");
+    else if (typeid(*file) == typeid(TagLib::WavPack::File))
+        lua_pushstring(L, "wavpack");
+    else if (typeid(*file) == typeid(TagLib::Ogg::Speex::File))
+        lua_pushstring(L, "speex");
+    else if (typeid(*file) == typeid(TagLib::TrueAudio::File))
+        lua_pushstring(L, "trueaudio");
+    else
+        lua_pushnil(L);
+    return 1;
+}
 
 static int tag_get(lua_State *L)
 {
@@ -162,6 +205,11 @@ static int prop_get(lua_State *L)
     return 1;
 }
 
+static const struct luaL_reg file_methods[] = {
+    {"type", file_type},
+    {NULL, NULL}
+};
+
 static const struct luaL_reg tag_methods[] = {
     {"get", tag_get},
     {"set", tag_set},
@@ -177,6 +225,7 @@ lua_State *init_lua(void)
 {
     lua_State *L = lua_open();
     luaL_openlibs(L);
+    luaL_register(L, "file", file_methods);
     luaL_register(L, "tag", tag_methods);
     luaL_register(L, "prop", prop_methods);
 
