@@ -222,8 +222,10 @@ int main(int argc, char **argv)
 #endif
 
     int ret = EXIT_SUCCESS;
+    TagLib::FileRef *f = 0;
     for (int i = 1; i < argc; i++) {
-        TagLib::FileRef *f = openFile(argv[i], type);
+        if (f) delete f;
+        f = openFile(argv[i], type);
         if (f && !f->isNull()) {
             if (set_tags) {
                 if (verbose)
