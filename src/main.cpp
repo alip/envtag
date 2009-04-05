@@ -185,7 +185,7 @@ int main(int argc, char **argv)
                 script = optarg;
                 break;
 #else
-                cerr << PACKAGE": -S/--script requires Lua support enabled" << endl;
+                cerr << PACKAGE": -S/--script requires Lua support enabled!" << endl;
                 return EX_USAGE;
 #endif
             case '?':
