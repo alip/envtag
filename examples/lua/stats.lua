@@ -7,7 +7,7 @@
 -- envtag uses the same lua_State for all processed files
 -- run this like: envtag -S stats.lua **/*.(flac|mp3|ogg|spx|tta)
 
-if loop.count == 1 then
+if loop.first then
     Song = {}
     function Song:new(tag, prop)
         local instance = {
@@ -92,7 +92,7 @@ if opt.verbose then
 end
 table.insert(db, Song:new(tag, prop))
 
-if loop.count == loop.total then
+if loop.last then
     artists, artists_count = db:getall"artist"
     albums, albums_count = db:getall"album"
     genres = db:getall"genre"

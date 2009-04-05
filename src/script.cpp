@@ -306,6 +306,12 @@ void doscript(const char *script, lua_State *L, TagLib::FileRef *f,
     lua_pushliteral(L, "total");
     lua_pushinteger(L, total);
     lua_settable(L, -3);
+    lua_pushliteral(L, "first");
+    lua_pushboolean(L, 1 == count ? 1 : 0);
+    lua_settable(L, -3);
+    lua_pushliteral(L, "last");
+    lua_pushboolean(L, total == count ? 1 : 0);
+    lua_settable(L, -3);
     lua_pop(L, 1);
 
     if (0 == strncmp(script, "-", 2)) {
