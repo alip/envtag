@@ -32,12 +32,14 @@ dnl }}}
 dnl }}}
 
 dnl {{{ toolchain checks
+AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 dnl }}}
 
 dnl {{{ check for taglib
+PKG_PROG_PKG_CONFIG([0.9.0])
 PKG_CHECK_MODULES([taglib], [taglib >= 1.5],,
 				  [AC_MSG_ERROR([envtag requires taglib-1.5 or newer])])
 dnl }}}
