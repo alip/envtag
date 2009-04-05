@@ -84,13 +84,14 @@ void usage(void) {
         cerr << "-"GITHEAD;
 #endif
     cerr << " simple audio tagger for use in shell scripts\n";
-    cerr << "Usage: "PACKAGE" [-t type] [-e encoding] [-s|-S FILE] [-hVvnE] file...\n\n";
+    cerr << "Usage: "PACKAGE" [-t type] [-e encoding] [-s|-S FILE] [-hVvpnE] file...\n\n";
     cerr << "Options:\n";
     cerr << "\t-h, --help\t\tYou're looking at it :)\n";
     cerr << "\t-V, --version\t\tShow version information\n";
     cerr << "\t-v, --verbose\t\tBe verbose\n";
     cerr << "\t-s, --set\t\tSet tags\n";
     cerr << "\t-S FILE, --script=FILE\tExecute script FILE on tags (use - for stdin)\n";
+    cerr << "\t-p, --print\t\tWhen used with -s or -S, prints tags after the action\n";
     cerr << "\t-t TYPE, --type=TYPE\tSpecify type\n";
     cerr << "\t-n, --no-unicode\tOperate on Latin1 strings when setting tags\n";
     cerr << "\t-e ENC, --encoding=ENC\tSpecify ID3v2 encoding\n";
@@ -114,6 +115,7 @@ int main(int argc, char **argv)
     bool verbose = false;
     bool export_vars = false;
     bool set_tags = false;
+    bool print_tags = false;
     bool unicode = true;
     int type = -1;
     bool encoding_set = false;
@@ -124,6 +126,7 @@ int main(int argc, char **argv)
         {"verbose",    no_argument,        NULL, 'v'},
         {"export",     no_argument,        NULL, 'E'},
         {"set",        no_argument,        NULL, 's'},
+        {"print",      no_argument,        NULL, 'p'},
         {"no-unicode", no_argument,        NULL, 'n'},
         {"type",       required_argument,  NULL, 't'},
         {"encoding",   required_argument,  NULL, 'e'},
@@ -131,7 +134,7 @@ int main(int argc, char **argv)
         {0, 0, NULL, 0}
     };
 
-    while (-1 != (optc = getopt_long(argc, argv, "VhsS:t:e:nEv", long_options, NULL))) {
+    while (-1 != (optc = getopt_long(argc, argv, "VhvEspnt:e:S:", long_options, NULL))) {
         switch (optc) {
             case 'h':
                 usage();
@@ -147,6 +150,9 @@ int main(int argc, char **argv)
                 break;
             case 's':
                 set_tags = true;
+                break;
+            case 'p':
+                print_tags = true;
                 break;
             case 'n':
                 unicode = false;
@@ -220,18 +226,20 @@ int main(int argc, char **argv)
         TagLib::FileRef *f = openFile(argv[i], type);
         if (f && !f->isNull()) {
             if (set_tags) {
+                if (verbose)
+                    cerr << PACKAGE": setting tags of `" << argv[i] << "'" << endl;
                 if (!setTags(*f, unicode)) {
                     ret = EXIT_FAILURE;
                     cerr << PACKAGE": failed to write tags to `" << argv[i] << "'" << endl;
                     continue;
                 }
-                if (!verbose)
+                if (!print_tags)
                     continue;
             }
 #ifdef ENABLE_LUA
             else if (script) {
                 doscript(script, lstate, f, argv[i], verbose, i, argc - 1);
-                if (!verbose)
+                if (!print_tags)
                     continue;
             }
 #endif
