@@ -89,6 +89,7 @@ void usage(void) {
     cerr << "\t-s, --set\t\tSet tags\n";
     cerr << "\t-S FILE, --script=FILE\tExecute script FILE on tags (use - for stdin)\n";
     cerr << "\t-p, --print\t\tWhen used with -s or -S, prints tags after the action\n";
+    cerr << "\t-P, --properties\tPrint audio properties as well\n";
     cerr << "\t-t TYPE, --type=TYPE\tSpecify type\n";
     cerr << "\t-n, --no-unicode\tOperate on Latin1 strings when setting tags\n";
     cerr << "\t-e ENC, --encoding=ENC\tSpecify ID3v2 encoding\n";
@@ -113,11 +114,13 @@ void usage(void) {
 int main(int argc, char **argv)
 {
     int optc;
-    bool verbose = false;
-    bool export_vars = false;
     bool set_tags = false;
     bool print_tags = false;
-    bool unicode = true;
+    struct envtag_opts eopts;
+    eopts.verbose = false;
+    eopts.unicode = true;
+    eopts.export_vars = false;
+    eopts.read_props = false;
     int type = -1;
     bool encoding_set = false;
     char *script = NULL;
@@ -128,6 +131,7 @@ int main(int argc, char **argv)
         {"export",     no_argument,        NULL, 'E'},
         {"set",        no_argument,        NULL, 's'},
         {"print",      no_argument,        NULL, 'p'},
+        {"properties", no_argument,        NULL, 'P'},
         {"no-unicode", no_argument,        NULL, 'n'},
         {"type",       required_argument,  NULL, 't'},
         {"encoding",   required_argument,  NULL, 'e'},
@@ -135,7 +139,7 @@ int main(int argc, char **argv)
         {0, 0, NULL, 0}
     };
 
-    while (-1 != (optc = getopt_long(argc, argv, "VhvEspnt:e:S:", long_options, NULL))) {
+    while (-1 != (optc = getopt_long(argc, argv, "VhvEspPnt:e:S:", long_options, NULL))) {
         switch (optc) {
             case 'h':
                 usage();
@@ -144,10 +148,10 @@ int main(int argc, char **argv)
                 about();
                 return EXIT_SUCCESS;
             case 'v':
-                verbose = true;
+                eopts.verbose = true;
                 break;
             case 'E':
-                export_vars = true;
+                eopts.export_vars = true;
                 break;
             case 's':
                 set_tags = true;
@@ -155,8 +159,11 @@ int main(int argc, char **argv)
             case 'p':
                 print_tags = true;
                 break;
+            case 'P':
+                eopts.read_props = true;
+                break;
             case 'n':
-                unicode = false;
+                eopts.unicode = false;
             case 't':
                 for (int i = 0; types[i].name != NULL; i++) {
                     if (0 == strncmp(optarg, types[i].name, strlen(types[i].name) + 1))
@@ -216,10 +223,10 @@ int main(int argc, char **argv)
     TagLib::FileRef *f = 0;
     for (int i = 1; i < argc; i++) {
         if (f) delete f;
-        f = openFile(argv[i], type);
+        f = openFile(argv[i], type, eopts.read_props);
         if (f && !f->isNull()) {
             if (set_tags) {
-                if (dobuiltin("set", lstate, f, argv[i], unicode, export_vars, verbose, i, argc - 1)) {
+                if (dobuiltin("set", lstate, f, argv[i], eopts, i, argc - 1)) {
                     ret = EXIT_FAILURE;
                     continue;
                 }
@@ -227,14 +234,14 @@ int main(int argc, char **argv)
                     continue;
             }
             else if (script) {
-                if (doscript(script, lstate, f, argv[i], unicode, export_vars, verbose, i, argc - 1)) {
+                if (doscript(script, lstate, f, argv[i], eopts, i, argc - 1)) {
                     ret = EXIT_FAILURE;
                     continue;
                 }
                 if (!print_tags)
                     continue;
             }
-            dobuiltin("print", lstate, f, argv[i], unicode, export_vars, verbose, i, argc - 1);
+            dobuiltin("print", lstate, f, argv[i], eopts, i, argc - 1);
         }
         else {
             ret = EXIT_FAILURE;

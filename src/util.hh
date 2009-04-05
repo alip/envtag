@@ -40,7 +40,7 @@ enum id3v2_encoding {
   TagLib_ID3v2_UTF8
 };
 
-TagLib::FileRef *openFile(const char *path, int type);
+TagLib::FileRef *openFile(const char *path, int type, bool readprops);
 void setID3v2DefaultEncoding(int encoding);
 bool dumpTags(const TagLib::FileRef f, bool export_vars);
 bool dumpProperties(const TagLib::FileRef f, bool export_vars);

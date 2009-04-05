@@ -20,15 +20,17 @@
 #ifndef ENVTAG_GUARD_SCRIPT_HH
 #define ENVTAG_GUARD_SCRIPT_HH 1
 
+#include "defs.hh"
+
 #include <lua.hpp>
 #include <fileref.h>
 
 lua_State *init_lua(void);
 int dobuiltin(const char *name, lua_State *L, TagLib::FileRef *f,
-        const char *file, bool unicode, bool export_vars, bool verbose,
+        const char *file, struct envtag_opts opts,
         int count, int total);
 int doscript(const char *script, lua_State *L, TagLib::FileRef *f,
-        const char *file, bool unicode, bool export_vars, bool verbose,
+        const char *file, struct envtag_opts opts,
         int count, int total);
 
 #endif // ENVTAG_GUARD_SCRIPT_HH

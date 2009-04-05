@@ -52,10 +52,10 @@ static std::string escapeQuotes(const String src)
     return escaped_str;
 }
 
-FileRef *openFile(const char *path, int type)
+FileRef *openFile(const char *path, int type, bool readprops)
 {
     if (TagLib_File_MPEG == type) {
-        MPEG::File *nf = new MPEG::File(path);
+        MPEG::File *nf = new MPEG::File(path, readprops);
         if (nf->isValid())
             return new FileRef(nf);
         else {
@@ -64,7 +64,7 @@ FileRef *openFile(const char *path, int type)
         }
     }
     else if (TagLib_File_OggVorbis == type) {
-        Ogg::Vorbis::File *nf = new Ogg::Vorbis::File(path);
+        Ogg::Vorbis::File *nf = new Ogg::Vorbis::File(path, readprops);
         if (nf->isValid())
             return new FileRef(nf);
         else {
@@ -73,7 +73,7 @@ FileRef *openFile(const char *path, int type)
         }
     }
     else if (TagLib_File_FLAC == type) {
-        FLAC::File *nf = new FLAC::File(path);
+        FLAC::File *nf = new FLAC::File(path, readprops);
         if (nf->isValid())
             return new FileRef(nf);
         else {
@@ -82,7 +82,7 @@ FileRef *openFile(const char *path, int type)
         }
     }
     else if (TagLib_File_MPC == type) {
-        MPC::File *nf = new MPC::File(path);
+        MPC::File *nf = new MPC::File(path, readprops);
         if (nf->isValid())
             return new FileRef(nf);
         else {
@@ -91,7 +91,7 @@ FileRef *openFile(const char *path, int type)
         }
     }
     else if (TagLib_File_OggFlac == type) {
-        Ogg::FLAC::File *nf = new Ogg::FLAC::File(path);
+        Ogg::FLAC::File *nf = new Ogg::FLAC::File(path, readprops);
         if (nf->isValid())
             return new FileRef(nf);
         else {
@@ -100,7 +100,7 @@ FileRef *openFile(const char *path, int type)
         }
     }
     else if (TagLib_File_WavPack == type) {
-        WavPack::File *nf = new WavPack::File(path);
+        WavPack::File *nf = new WavPack::File(path, readprops);
         if (nf->isValid())
             return new FileRef(nf);
         else {
@@ -109,7 +109,7 @@ FileRef *openFile(const char *path, int type)
         }
     }
     else if (TagLib_File_Speex == type) {
-        Ogg::Speex::File *nf = new Ogg::Speex::File(path);
+        Ogg::Speex::File *nf = new Ogg::Speex::File(path, readprops);
         if (nf->isValid())
             return new FileRef(nf);
         else {
@@ -118,7 +118,7 @@ FileRef *openFile(const char *path, int type)
         }
     }
     else if (TagLib_File_TrueAudio == type) {
-        TrueAudio::File *nf = new TrueAudio::File(path);
+        TrueAudio::File *nf = new TrueAudio::File(path, readprops);
         if (nf->isValid())
             return new FileRef(nf);
         else {
@@ -127,7 +127,7 @@ FileRef *openFile(const char *path, int type)
         }
     }
     else
-        return new FileRef(path);
+        return new FileRef(path, readprops);
 }
 
 void setID3v2DefaultEncoding(int encoding)

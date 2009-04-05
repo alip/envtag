@@ -21,10 +21,10 @@ if loop.first then
             year = tag.get"year",
             track = tag.get"track",
 
-            length = prop.get"length",
-            bitrate = prop.get"bitrate",
-            samplerate = prop.get"samplerate",
-            channels = prop.get"channels",
+            length = prop.get"length" or 0,
+            bitrate = prop.get"bitrate" or 0,
+            samplerate = prop.get"samplerate" or 0,
+            channels = prop.get"channels" or 0,
         }
 
         return setmetatable(instance, {__index = Song})

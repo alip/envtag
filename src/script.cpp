@@ -293,7 +293,7 @@ string getscript(const char *script)
 }
 
 static void initscript(lua_State *L, TagLib::FileRef *f,
-        const char *file, bool unicode, bool export_vars, bool verbose,
+        const char *file, struct envtag_opts opts,
         int count, int total)
 {
     lua_getglobal(L, "file");
@@ -307,13 +307,16 @@ static void initscript(lua_State *L, TagLib::FileRef *f,
 
     lua_getglobal(L, "opt");
     lua_pushliteral(L, "unicode");
-    lua_pushboolean(L, unicode);
+    lua_pushboolean(L, opts.unicode);
     lua_settable(L, -3);
     lua_pushliteral(L, "export");
-    lua_pushboolean(L, export_vars);
+    lua_pushboolean(L, opts.export_vars);
     lua_settable(L, -3);
     lua_pushliteral(L, "verbose");
-    lua_pushboolean(L, verbose);
+    lua_pushboolean(L, opts.verbose);
+    lua_settable(L, -3);
+    lua_pushliteral(L, "read_props");
+    lua_pushboolean(L, opts.read_props);
     lua_settable(L, -3);
     lua_pop(L, 1);
 
@@ -334,23 +337,23 @@ static void initscript(lua_State *L, TagLib::FileRef *f,
 }
 
 int dobuiltin(const char *name, lua_State *L, TagLib::FileRef *f,
-        const char *file, bool unicode, bool export_vars, bool verbose,
+        const char *file, struct envtag_opts opts,
         int count, int total)
 {
     string script = string(name);
     script = LIBEXECDIR"/"PACKAGE"/" + script + ".lua";
 
-    return doscript(script.c_str(), L, f, file, unicode, export_vars, verbose, count, total);
+    return doscript(script.c_str(), L, f, file, opts, count, total);
 }
 
 int doscript(const char *script, lua_State *L, TagLib::FileRef *f,
-        const char *file, bool unicode, bool export_vars, bool verbose,
+        const char *file, struct envtag_opts opts,
         int count, int total)
 {
     int ret;
     struct stat buf;
 
-    initscript(L, f, file, unicode, export_vars, verbose, count, total);
+    initscript(L, f, file, opts, count, total);
     if (0 == strncmp(script, "-", 2)) {
         // Read from standard input
         script = NULL;

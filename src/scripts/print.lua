@@ -42,10 +42,12 @@ do
     print(format("%sGENRE='%s'", prefix, genre))
     print(format("%sYEAR=%d", prefix, year))
     print(format("%sTRACK=%d", prefix, track))
-    print""
-    print(format("%sLENGTH=%d", prefix, length))
-    print(format("%sBITRATE=%d", prefix, bitrate))
-    print(format("%sSAMPLERATE=%d", prefix, samplerate))
-    print(format("%sCHANNELS=%d", prefix, channels))
+    if opt.read_props then
+        print""
+        print(format("%sLENGTH=%d", prefix, length))
+        print(format("%sBITRATE=%d", prefix, bitrate))
+        print(format("%sSAMPLERATE=%d", prefix, samplerate))
+        print(format("%sCHANNELS=%d", prefix, channels))
+    end
 end
 

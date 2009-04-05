@@ -27,4 +27,11 @@
 #define ENV_INIT "ENVTAG_INIT"
 #define SCRIPT_SEARCH_DIR "/.envtag/lua/"
 
+struct envtag_opts {
+    bool verbose;
+    bool unicode;
+    bool export_vars;
+    bool read_props;
+};
+
 #endif /* ENVTAG_GUARD_DEFS_HH */
