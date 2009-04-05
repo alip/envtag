@@ -16,3 +16,4 @@ artist = assert(tag.get"artist")
 cartist = capitalize(artist)
 if VERBOSE then print(artist, "-->", cartist) end
 tag.set("artist", cartist)
+file.save()
