@@ -253,5 +253,9 @@ int main(int argc, char **argv)
             cerr << PACKAGE": unknown file type `" << argv[i] << "'" << endl;
         }
     }
+#ifdef ENABLE_LUA
+    if (lstate)
+        lua_close(lstate);
+#endif
     return ret;
 }
