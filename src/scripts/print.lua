@@ -4,16 +4,14 @@
 -- Copyright 2009 Ali Polatel <polatel@gmail.com>
 -- Distributed under the terms of the GNU General Public License v2
 
+require "envtag"
+
 do
-    local gsub = string.gsub
     local format = string.format
     local upper = string.upper
     local concat = table.concat
 
-    local function escapeq(str)
-        return gsub(str, "'", "'\\''")
-    end
-
+    local escapeq = envtag.escapeq
     local prefix = opt.export and "export " or ""
 
     if tag.has_xiph() then

@@ -4,30 +4,15 @@
 -- Copyright 2009 Ali Polatel <polatel@gmail.com>
 -- Distributed under the terms of the GNU General Public License v2
 
+require "envtag"
+
 do
     local sub = string.sub
     local upper = string.upper
     local insert = table.insert
     local getenv = os.getenv
 
-    local function split(str, char)
-        local chunk = ""
-        local list = {}
-        local i = 1
-
-        while i <= #str do
-            local c = string.sub(str, i, i)
-            if c == char then
-                table.insert(list, chunk)
-                chunk = ""
-            else
-                chunk = chunk .. c
-            end
-            i = i + 1
-        end
-        table.insert(list, chunk)
-        return list
-    end
+    local split = envtag.split
 
     if tag.has_xiph() then
         -- Xiph Comment
@@ -50,3 +35,4 @@ do
     end
     assert(file.save(), "failed to save `" .. file.name .. "'")
 end
+

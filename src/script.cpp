@@ -427,6 +427,11 @@ lua_State *init_lua(void)
     lua_newtable(L);
     lua_setglobal(L, "loop");
 
+    // Add LIBEXECDIR/PATH/?.lua to package.path
+    if (0 != luaL_dostring(L, "package.path = '"LIBEXECDIR"/"PACKAGE"/?.lua;' .. package.path"))
+        std::cerr << PACKAGE": error adding envtag script directory to package.path: "  \
+            << lua_tostring(L, -1) << std::endl;
+
     // Initialize using ENV_INIT
     char *init = getenv(ENV_INIT);
     if (NULL != init) {
