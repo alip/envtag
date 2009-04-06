@@ -5,28 +5,48 @@
 -- Distributed under the terms of the GNU General Public License v2
 
 do
+    local sub = string.sub
+    local upper = string.upper
+    local insert = table.insert
     local getenv = os.getenv
 
-    local title = getenv"TITLE"
-    if title then tag.set("title", title) end
+    local function split(str, char)
+        local chunk = ""
+        local list = {}
+        local i = 1
 
-    local artist = getenv"ARTIST"
-    if artist then tag.set("artist", artist) end
+        while i <= #str do
+            local c = string.sub(str, i, i)
+            if c == char then
+                table.insert(list, chunk)
+                chunk = ""
+            else
+                chunk = chunk .. c
+            end
+            i = i + 1
+        end
+        table.insert(list, chunk)
+        return list
+    end
 
-    local album = getenv"ALBUM"
-    if album then tag.set("album", album) end
-
-    local comment = getenv"COMMENT"
-    if comment then tag.set("comment", comment) end
-
-    local genre = getenv"GENRE"
-    if genre then tag.set("genre", genre) end
-
-    local year = getenv"YEAR"
-    if year then tag.set("year", tonumber(year)) end
-
-    local track = getenv"TRACK"
-    if track then tag.set("track", tonumber(track)) end
-
+    if tag.has_xiph() then
+        -- Xiph Comment
+        xiph_tags = {"title", "version", "album", "artist",
+                     "performer", "copyright", "organization", "description",
+                     "genre", "date", "location", "contact", "isrc"}
+        for _, tname in ipairs(xiph_tags) do
+            local t = getenv(upper(tname))
+            if t then
+                tag.set_xiph(tname, opt.append, split(t, opt.delimiter))
+            end
+        end
+    else
+        -- Common tags
+        common_tags = {"title", "artist", "album", "comment", "genre", "year", "track"}
+        for _, tname in ipairs(common_tags) do
+            local t = getenv(upper(tname))
+            if t then tag.set(tname, (tname == "year" or tname == "track") and tonumber(t) or t) end
+        end
+    end
     assert(file.save(), "failed to save `" .. file.name .. "'")
 end

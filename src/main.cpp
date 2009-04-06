@@ -81,7 +81,7 @@ void usage(void) {
         cerr << "-"GITHEAD;
 #endif
     cerr << " simple audio tagger for use in shell scripts\n";
-    cerr << "Usage: "PACKAGE" [-t type] [-e encoding] [-s|-S FILE/-] [-d DELIM] [-hVvpnE] file...\n\n";
+    cerr << "Usage: "PACKAGE" [-t TYPE] [-e ENCODING] [-s|-S FILE/-] [-d DELIM] [-hVvpPnaE] file...\n\n";
     cerr << "Options:\n";
     cerr << "\t-h, --help\t\tYou're looking at it :)\n";
     cerr << "\t-V, --version\t\tShow version information\n";
@@ -90,10 +90,11 @@ void usage(void) {
     cerr << "\t-S FILE, --script=FILE\tExecute script FILE on tags (use - for stdin)\n";
     cerr << "\t-p, --print\t\tWhen used with -s or -S, prints tags after the action\n";
     cerr << "\t-P, --properties\tPrint audio properties as well\n";
-    cerr << "\t-d DELIM, --delimiter=DELIM\n\t\t\t\tSpecify delimiter for multiple tags (default is '=')\n";
     cerr << "\t-t TYPE, --type=TYPE\tSpecify type\n";
     cerr << "\t-n, --no-unicode\tOperate on Latin1 strings when setting tags\n";
     cerr << "\t-e ENC, --encoding=ENC\tSpecify ID3v2 encoding\n";
+    cerr << "\t-a, --append\t\tAppend tags instead of replacing (for Xiph Comments)\n";
+    cerr << "\t-d DELIM, --delimiter=DELIM\n\t\t\t\tSpecify delimiter for multiple tags (default is '=')\n";
     cerr << "\t-E, --export\t\tPrepend tag lines with export\n";
     cerr << "\nTypes:\n";
     cerr << "\tmpeg, vorbis, flac, mpc, oggflac, wavpack, speex, trueaudio\n";
@@ -122,6 +123,7 @@ int main(int argc, char **argv)
     eopts.unicode = true;
     eopts.export_vars = false;
     eopts.read_props = false;
+    eopts.append = false;
     eopts.delimiter = "=";
     int type = -1;
     bool encoding_set = false;
@@ -135,6 +137,7 @@ int main(int argc, char **argv)
         {"print",      no_argument,        NULL, 'p'},
         {"properties", no_argument,        NULL, 'P'},
         {"no-unicode", no_argument,        NULL, 'n'},
+        {"append",     no_argument,        NULL, 'a'},
         {"delimiter",  required_argument,  NULL, 'd'},
         {"type",       required_argument,  NULL, 't'},
         {"encoding",   required_argument,  NULL, 'e'},
@@ -142,7 +145,7 @@ int main(int argc, char **argv)
         {0, 0, NULL, 0}
     };
 
-    while (-1 != (optc = getopt_long(argc, argv, "VhvEspPnd:t:e:S:", long_options, NULL))) {
+    while (-1 != (optc = getopt_long(argc, argv, "VhvEspPnad:t:e:S:", long_options, NULL))) {
         switch (optc) {
             case 'h':
                 usage();
@@ -168,7 +171,14 @@ int main(int argc, char **argv)
             case 'n':
                 eopts.unicode = false;
                 break;
+            case 'a':
+                eopts.append = true;
+                break;
             case 'd':
+                if (1 < strlen(optarg)) {
+                    cerr << PACKAGE": the delimiter must be a single character" << endl;
+                    return EX_USAGE;
+                }
                 eopts.delimiter = optarg;
                 break;
             case 't':

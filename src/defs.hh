@@ -32,6 +32,7 @@ struct envtag_opts {
     bool unicode;
     bool export_vars;
     bool read_props;
+    bool append;
     const char *delimiter;
 };
 

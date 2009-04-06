@@ -54,6 +54,36 @@
 
 using namespace TagLib;
 
+#if 0
+static void stackdump(lua_State *L)
+{
+    int i;
+    int top = lua_gettop(L);
+
+    printf("Total: %d\n", top);
+
+    for (i = 1; i <= top; i++) {
+        int t = lua_type(L, i);
+        switch (t) {
+            case LUA_TSTRING:
+                printf("String: '%s'\n", lua_tostring(L, i));
+                break;
+            case LUA_TBOOLEAN:
+                printf("Boolean: %s\n", lua_toboolean(L, i) ? "true" : "false");
+                break;
+            case LUA_TNUMBER:
+                printf("Number: %g\n", lua_tonumber(L, i));
+                break;
+            default:
+                printf("%s\n", lua_typename(L, t));
+                break;
+        }
+        printf("  ");
+    }
+    printf("\n");
+}
+#endif
+
 static inline bool isxiph(const char *tag)
 {
     if (0 == strncmp(tag, "title", 6))
@@ -91,7 +121,9 @@ static FileRef *getfp(lua_State *L)
     lua_getglobal(L, "file");
     lua_pushliteral(L, "udata");
     lua_gettable(L, -2);
-    return (FileRef *) lua_touserdata(L, -1);
+    FileRef *f = (FileRef *) lua_touserdata(L, -1);
+    lua_pop(L, 2);
+    return f;
 }
 
 static int file_save(lua_State *L)
@@ -289,6 +321,46 @@ static int tag_set(lua_State *L)
     return 0;
 }
 
+static int tag_setxiph(lua_State *L)
+{
+    const char *tname = luaL_checkstring(L, 1);
+    bool append = lua_toboolean(L, 2);
+
+    if (!lua_istable(L, 3))
+        return luaL_argerror(L, 3, "not a table");
+    if (!isxiph(tname))
+        return luaL_argerror(L, 1, "invalid tag");
+
+    FileRef *f = getfp(L);
+    if (!f)
+        return luaL_error(L, "no audio file");
+    else if (!f->tag())
+        return luaL_error(L, "no audio tags");
+
+    File *file = f->file();
+    Ogg::XiphComment *xtag;
+    if (dynamic_cast<Ogg::File *>(file))
+        xtag = dynamic_cast<Ogg::XiphComment *>(f->tag());
+    else if (dynamic_cast<FLAC::File *>(file)) {
+        FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
+        if (!ff->xiphComment())
+            return luaL_error(L, "no xiph comment");
+        xtag = ff->xiphComment();
+    }
+    else
+        return luaL_error(L, "no xiph comment");
+
+    String tupper = String(tname).upper();
+    lua_pushnil(L);
+    while (0 != lua_next(L, -2)) {
+        const char *value = luaL_checkstring(L, -1);
+        String svalue = (0 == strncmp(value, "", 1)) ? String::null : String(value);
+        xtag->addField(tupper, svalue, !append);
+        lua_pop(L, 1);
+    }
+    return 0;
+}
+
 static int prop_get(lua_State *L)
 {
     const char *pname = luaL_checkstring(L, 1);
@@ -330,6 +402,7 @@ static const struct luaL_reg tag_methods[] = {
     {"set", tag_set},
     {"has_xiph", tag_hasxiph},
     {"get_xiph", tag_getxiph},
+    {"set_xiph", tag_setxiph},
     {NULL, NULL}
 };
 
@@ -425,6 +498,9 @@ static void initscript(lua_State *L, FileRef *f,
     lua_settable(L, -3);
     lua_pushliteral(L, "read_props");
     lua_pushboolean(L, opts.read_props);
+    lua_settable(L, -3);
+    lua_pushliteral(L, "append");
+    lua_pushboolean(L, opts.append);
     lua_settable(L, -3);
     lua_pushliteral(L, "delimiter");
     lua_pushstring(L, opts.delimiter);
