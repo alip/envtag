@@ -53,6 +53,38 @@
 
 using namespace TagLib;
 
+static inline bool isxiph(const char *tag)
+{
+    if (0 == strncmp(tag, "title", 6))
+        return true;
+    else if (0 == strncmp(tag, "version", 8))
+        return true;
+    else if (0 == strncmp(tag, "album", 6))
+        return true;
+    else if (0 == strncmp(tag, "artist", 7))
+        return true;
+    else if (0 == strncmp(tag, "performer", 10))
+        return true;
+    else if (0 == strncmp(tag, "copyright", 10))
+        return true;
+    else if (0 == strncmp(tag, "organization", 13))
+        return true;
+    else if (0 == strncmp(tag, "description", 12))
+        return true;
+    else if (0 == strncmp(tag, "genre", 6))
+        return true;
+    else if (0 == strncmp(tag, "date", 5))
+        return true;
+    else if (0 == strncmp(tag, "location", 9))
+        return true;
+    else if (0 == strncmp(tag, "contact", 8))
+        return true;
+    else if (0 == strncmp(tag, "isrc", 5))
+        return true;
+    else
+        return false;
+}
+
 static FileRef *getfp(lua_State *L)
 {
     lua_getglobal(L, "file");
@@ -180,41 +212,27 @@ static int tag_getxiph(lua_State *L)
     else
         return luaL_error(L, "no xiph comment");
 
-    const Ogg::FieldListMap flm = xtag->fieldListMap();
-    if (0 == strncmp(tname, "title", 6)
-        || 0 == strncmp(tname, "version", 8)
-        || 0 == strncmp(tname, "album", 6)
-        || 0 == strncmp(tname, "artist", 7)
-        || 0 == strncmp(tname, "performer", 10)
-        || 0 == strncmp(tname, "copyright", 10)
-        || 0 == strncmp(tname, "organization", 13)
-        || 0 == strncmp(tname, "description", 12)
-        || 0 == strncmp(tname, "genre", 6)
-        || 0 == strncmp(tname, "date", 5)
-        || 0 == strncmp(tname, "location", 9)
-        || 0 == strncmp(tname, "contact", 8)
-        || 0 == strncmp(tname, "isrc", 5)) {
-        String tupper = String(tname).upper();
-        if (!xtag->contains(tupper)) {
-            lua_pushnil(L);
-            lua_pushstring(L, "not set");
-            return 2;
-        }
-
-        int tableind = 1;
-        lua_newtable(L);
-        StringList::ConstIterator valuesIt = flm[tupper].begin();
-        for (; valuesIt != flm[tupper].end(); valuesIt++) {
-            lua_pushinteger(L, tableind++);
-            lua_pushstring(L, (*valuesIt).data(unicode ? String::UTF8 : String::Latin1).data());
-            lua_settable(L, -3);
-        }
-    }
-    else
+    if (!isxiph(tname))
         return luaL_argerror(L, 1, "invalid tag");
+
+    const Ogg::FieldListMap flm = xtag->fieldListMap();
+    String tupper = String(tname).upper();
+    if (!xtag->contains(tupper)) {
+        lua_pushnil(L);
+        lua_pushstring(L, "not set");
+        return 2;
+    }
+
+    int tableind = 1;
+    lua_newtable(L);
+    StringList::ConstIterator valuesIt = flm[tupper].begin();
+    for (; valuesIt != flm[tupper].end(); valuesIt++) {
+        lua_pushinteger(L, tableind++);
+        lua_pushstring(L, (*valuesIt).data(unicode ? String::UTF8 : String::Latin1).data());
+        lua_settable(L, -3);
+    }
     return 1;
 }
-
 
 static int tag_set(lua_State *L)
 {
