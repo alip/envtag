@@ -12,20 +12,22 @@ if loop.first then
     function Song:new(tag, prop)
         local instance = {
             name = file.name,
-
-            title = tag.get"title",
-            artist = tag.get"artist",
-            album = tag.get"album",
-            comment = tag.get"comment",
-            genre = tag.get"genre",
-            year = tag.get"year",
-            track = tag.get"track",
+            xiph = tag.has_xiph(),
 
             length = prop.get"length" or 0,
             bitrate = prop.get"bitrate" or 0,
             samplerate = prop.get"samplerate" or 0,
             channels = prop.get"channels" or 0,
         }
+
+        title = tag.get("title", opt.unicode)
+        instance.title = title and (instance.xiph and title[1] or title)
+        artist = tag.get("artist", opt.unicode)
+        instance.artist = artist and (instance.xiph and artist[1] or artist)
+        album = tag.get("album", opt.unicode)
+        instance.album = album and (instance.xiph and album[1] or album)
+        genre = tag.get("genre", opt.unicode)
+        instance.genre = genre and (instance.xiph and genre[1] or genre)
 
         return setmetatable(instance, {__index = Song})
     end
@@ -88,7 +90,7 @@ if loop.first then
 end
 
 if opt.verbose then
-    print(string.format("Processing %s (%d/%d)", file.name, loop.count, loop.total))
+    print(string.format("> (%d/%d) %s", loop.count, loop.total, file.name))
 end
 table.insert(db, Song:new(tag, prop))
 
