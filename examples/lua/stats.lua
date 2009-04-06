@@ -6,6 +6,7 @@
 
 -- envtag uses the same lua_State for all processed files
 -- run this like: envtag -S stats.lua **/*.(flac|mp3|ogg|spx|tta)
+-- or copy this to ~/.envtag/lua/stats and run it like envtag -S stats ...
 
 if loop.first then
     Song = {}
