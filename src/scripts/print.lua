@@ -16,10 +16,7 @@ do
 
     if tag.has_xiph() then
         -- Xiph Comments
-        xiph_tags = {"title", "version", "album", "artist",
-                     "performer", "copyright", "organization", "description",
-                     "genre", "date", "location", "contact", "isrc"}
-        for _, tname in ipairs(xiph_tags) do
+        for _, tname in ipairs(envtag.XIPH_TAGS) do
             local t = tag.get_xiph(tname, opt.unicode)
             if t then
                 print(format("%s%s='%s'", prefix, upper(tname), escapeq(concat(t, opt.delimiter))))
@@ -29,9 +26,7 @@ do
         end
     else
         -- Common Tags
-        common_tags = {"title", "artist", "album", "comment",
-                       "genre", "year", "track"}
-        for _, tname in ipairs(common_tags) do
+        for _, tname in ipairs(envtag.COMMON_TAGS) do
             local t = tag.get(tname, opt.unicode)
             if t then
                 print(format("%s%s='%s'", prefix, upper(tname), escapeq(t)))

@@ -10,6 +10,16 @@ local insert = table.insert
 
 module "envtag"
 
+COMMON_TAGS = {
+    "title", "artist", "album", "comment",
+    "genre", "year", "track"
+}
+XIPH_TAGS = {
+    "title", "version", "album", "artist",
+    "performer", "copyright", "organization", "description",
+    "genre", "date", "location", "contact", "isrc"
+}
+
 function escapeq(str)
     return gsub(str, "'", "'\\''")
 end
