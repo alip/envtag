@@ -7,6 +7,8 @@
 do
     local gsub = string.gsub
     local format = string.format
+    local upper = string.upper
+    local concat = table.concat
 
     local function escapeq(str)
         return gsub(str, "'", "'\\''")
@@ -14,35 +16,40 @@ do
 
     local prefix = opt.export and "export " or ""
 
-    -- Tags
-    local title = tag.get("title", opt.unicode)
-    title = title and escapeq(title) or ""
-    local artist = tag.get("artist", opt.unicode)
-    artist = artist and escapeq(artist) or ""
-    local album = tag.get("album", opt.unicode)
-    album = album and escapeq(album) or ""
-    local comment = tag.get("comment", opt.unicode)
-    comment = comment and escapeq(comment) or ""
-    local genre = tag.get("genre", opt.unicode)
-    genre = genre and escapeq(genre) or ""
-    local year = tag.get"year" or 0
-    local track = tag.get"track" or 0
+    if tag.has_xiph() then
+        -- Xiph Comments
+        xiph_tags = {"title", "version", "album", "artist",
+                     "performer", "copyright", "organization", "description",
+                     "genre", "date", "location", "contact", "isrc"}
+        for _, tname in ipairs(xiph_tags) do
+            local t = tag.get_xiph(tname, opt.unicode)
+            if t then
+                print(format("%s%s='%s'", prefix, upper(tname), escapeq(concat(t, opt.delimiter))))
+            else
+                print("unset " .. upper(tname))
+            end
+        end
+    else
+        -- Common Tags
+        common_tags = {"title", "artist", "album", "comment",
+                       "genre", "year", "track"}
+        for _, tname in ipairs(common_tags) do
+            local t = tag.get(tname, opt.unicode)
+            if t then
+                print(format("%s%s='%s'", prefix, upper(t), escapeq(t)))
+            else
+                print("unset " .. upper(t))
+            end
+        end
+    end
 
     -- Audio properties
-    local length = prop.get"length" or 0
-    local bitrate = prop.get"bitrate" or 0
-    local samplerate = prop.get"samplerate" or 0
-    local channels = prop.get"channels" or 0
-
-    -- Output
-    print(format("%sTITLE='%s'", prefix, title))
-    print(format("%sARTIST='%s'", prefix, artist))
-    print(format("%sALBUM='%s'", prefix, album))
-    print(format("%sCOMMENT='%s'", prefix, comment))
-    print(format("%sGENRE='%s'", prefix, genre))
-    print(format("%sYEAR=%d", prefix, year))
-    print(format("%sTRACK=%d", prefix, track))
     if opt.read_props then
+        local length = prop.get"length" or 0
+        local bitrate = prop.get"bitrate" or 0
+        local samplerate = prop.get"samplerate" or 0
+        local channels = prop.get"channels" or 0
+
         print""
         print(format("%sLENGTH=%d", prefix, length))
         print(format("%sBITRATE=%d", prefix, bitrate))
