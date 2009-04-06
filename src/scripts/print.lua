@@ -34,9 +34,9 @@ do
         for _, tname in ipairs(common_tags) do
             local t = tag.get(tname, opt.unicode)
             if t then
-                print(format("%s%s='%s'", prefix, upper(t), escapeq(t)))
+                print(format("%s%s='%s'", prefix, upper(tname), escapeq(t)))
             else
-                print("unset " .. upper(t))
+                print("unset " .. upper(tname))
             end
         end
     end

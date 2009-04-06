@@ -184,20 +184,48 @@ static int tag_get(lua_State *L)
         return luaL_error(L, "no audio tags");
 
     Tag *tag = f->tag();
-    if (0 == strncmp(tname, "title", 6))
-        lua_pushstring(L, tag->title().toCString(unicode));
-    else if (0 == strncmp(tname, "artist", 7))
-        lua_pushstring(L, tag->artist().toCString(unicode));
-    else if (0 == strncmp(tname, "album", 6))
-        lua_pushstring(L, tag->album().toCString(unicode));
-    else if (0 == strncmp(tname, "comment", 8))
-        lua_pushstring(L, tag->comment().toCString(unicode));
-    else if (0 == strncmp(tname, "genre", 6))
-        lua_pushstring(L, tag->genre().toCString(unicode));
-    else if (0 == strncmp(tname, "year", 5))
-        lua_pushinteger(L, tag->year());
-    else if (0 == strncmp(tname, "track", 6))
-        lua_pushinteger(L, tag->track());
+    if (0 == strncmp(tname, "title", 6)) {
+        if (String::null == tag->title())
+            lua_pushnil(L);
+        else
+            lua_pushstring(L, tag->title().toCString(unicode));
+    }
+    else if (0 == strncmp(tname, "artist", 7)) {
+        if (String::null == tag->artist())
+            lua_pushnil(L);
+        else
+            lua_pushstring(L, tag->artist().toCString(unicode));
+    }
+    else if (0 == strncmp(tname, "album", 6)) {
+        if (String::null == tag->album())
+            lua_pushnil(L);
+        else
+            lua_pushstring(L, tag->album().toCString(unicode));
+    }
+    else if (0 == strncmp(tname, "comment", 8)) {
+        if (String::null == tag->comment())
+            lua_pushnil(L);
+        else
+            lua_pushstring(L, tag->comment().toCString(unicode));
+    }
+    else if (0 == strncmp(tname, "genre", 6)) {
+        if (String::null == tag->genre())
+            lua_pushnil(L);
+        else
+            lua_pushstring(L, tag->genre().toCString(unicode));
+    }
+    else if (0 == strncmp(tname, "year", 5)) {
+        if (0 == tag->year())
+            lua_pushnil(L);
+        else
+            lua_pushinteger(L, tag->year());
+    }
+    else if (0 == strncmp(tname, "track", 6)) {
+        if (0 == tag->track())
+            lua_pushnil(L);
+        else
+            lua_pushinteger(L, tag->track());
+    }
     else
         return luaL_argerror(L, 1, "invalid tag");
     return 1;
@@ -280,16 +308,17 @@ static int tag_set(lua_State *L)
     const char *tname = luaL_checkstring(L, 1);
 
     int tnum = 0;
-    const char *tval;
+    String tval;
     if (0 == strncmp(tname, "year", 5) || 0 == strncmp(tname, "track", 6)) {
         tnum = luaL_checkinteger(L, 2);
-        tval = NULL;
+        tval = String::null;
     }
-    else
-        tval = luaL_checkstring(L, 2);
+    else {
+        const char *cval = luaL_checkstring(L, 2);
+        tval = (0 == strncmp(cval, "", 1)) ? String::null : String(cval);
+    }
 
     FileRef *f = getfp(L);
-
     if (!f) {
         lua_pushnil(L);
         lua_pushstring(L, "no audio file");
