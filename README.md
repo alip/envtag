@@ -1,10 +1,10 @@
 ## What is envtag?
 
-envtag is a simple audio tagger using taglib.
+envtag is a simple audio tagger using [taglib](http://developer.kde.org/~wheeler/taglib.html).
 It offers two interfaces to edit tags:
 
- * Simple interface using environment variables
- * Advanced interface using Lua scripts
+ * Simple interface using environment variables.
+ * Advanced interface using [Lua](http://www.lua.org/) scripts.
 
 ## Examples
 
