@@ -3,7 +3,10 @@
 envtag is a simple audio tagger using taglib.
 It offers two interfaces to edit tags:
 
- * Simple interface using environment variables:
+ * Simple interface using environment variables
+ * Advanced interface using Lua scripts
+
+## Examples
 
     # Reading tag information
     eval $(envtag /path/to/audio/file)
