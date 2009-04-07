@@ -1,0 +1,17 @@
+News for envtag
+===============
+
+This file lists the major changes between versions. For a more detailed list of
+every change, see git log.
+
+0.3:
+    * Rewritten in C++ to make better use of taglib
+    * Lua is a hard dependency now, envtag uses it extensively
+    * Support for getting/setting Xiph Comments
+    * Optional libmagic based filetype detection support, enable with --enable-libmagic
+
+0.2:
+    * Optional support for Lua scripting on tags
+
+0.1:
+    * Initial public release
