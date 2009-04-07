@@ -2,6 +2,7 @@
 
 envtag is a simple audio tagger using taglib.
 It offers two interfaces to edit tags:
+
  * Simple interface using environment variables:
 
     # Reading tag information
