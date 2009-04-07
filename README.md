@@ -8,6 +8,9 @@ It offers two interfaces to edit tags:
 
 ## Examples
 
+Here are some examples of simple usage. For advanced usage, have a look at
+examples/ directory under source tree.
+
     # Reading tag information
     eval $(envtag /path/to/audio/file)
     echo "Title: $TITLE"
@@ -36,3 +39,4 @@ Contributions to envtag are welcome:
 ## Authors
 
  * Ali Polatel &lt;polatel@gmail.com&gt;
+
