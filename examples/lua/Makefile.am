@@ -1,3 +1,3 @@
 MAINTAINERCLEANFILES= Makefile.in
-EXTRA_DIST= capitalize.lua print.lua stats.lua
+EXTRA_DIST= capitalize.lua stats.lua
 SUBDIRS= .
