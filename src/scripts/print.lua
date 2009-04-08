@@ -16,7 +16,7 @@ do
 
     if tag.has_xiph() then
         -- Xiph Comments
-        for _, tname in ipairs(envtag.XIPH_TAGS) do
+        for _, tname in ipairs(envtag.TAGS_XIPH) do
             local t = tag.get_xiph(tname, opt.unicode)
             if t then
                 print(format("%s%s='%s'", prefix, upper(tname), escapeq(concat(t, opt.delimiter))))
@@ -26,7 +26,7 @@ do
         end
     else
         -- Common Tags
-        for _, tname in ipairs(envtag.COMMON_TAGS) do
+        for _, tname in ipairs(envtag.TAGS_COMMON) do
             local t = tag.get(tname, opt.unicode)
             if t then
                 print(format("%s%s='%s'", prefix, upper(tname), escapeq(t)))

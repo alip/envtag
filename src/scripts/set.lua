@@ -16,7 +16,7 @@ do
 
     if tag.has_xiph() then
         -- Xiph Comment
-        for _, tname in ipairs(envtag.XIPH_TAGS) do
+        for _, tname in ipairs(envtag.TAGS_XIPH) do
             local t = getenv(upper(tname))
             if t then
                 tag.set_xiph(tname, opt.append, split(t, opt.delimiter))
@@ -24,7 +24,7 @@ do
         end
     else
         -- Common tags
-        for _, tname in ipairs(envtag.COMMON_TAGS) do
+        for _, tname in ipairs(envtag.TAGS_COMMON) do
             local t = getenv(upper(tname))
             if t then tag.set(tname, (tname == "year" or tname == "track") and tonumber(t) or t) end
         end

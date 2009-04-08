@@ -10,11 +10,11 @@ local insert = table.insert
 
 module "envtag"
 
-COMMON_TAGS = {
+TAGS_COMMON = {
     "title", "artist", "album", "comment",
     "genre", "year", "track"
 }
-XIPH_TAGS = {
+TAGS_XIPH = {
     "title", "version", "album", "artist",
     "performer", "copyright", "organization", "description",
     "genre", "date", "location", "contact", "isrc"
