@@ -20,12 +20,15 @@
 #ifndef ENVTAG_GUARD_SCRIPT_HH
 #define ENVTAG_GUARD_SCRIPT_HH 1
 
-#include "defs.hh"
+#include <string>
 
 #include <lua.hpp>
 #include <fileref.h>
 
+#include "defs.hh"
+
 lua_State *init_lua(void);
+std::string getscript(const char *script);
 int dobuiltin(const char *name, lua_State *L, TagLib::FileRef *f,
         const char *file, struct envtag_opts opts,
         int count, int total);

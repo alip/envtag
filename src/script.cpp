@@ -572,25 +572,9 @@ int doscript(const char *script, lua_State *L, FileRef *f,
         int count, int total)
 {
     int ret;
-    struct stat buf;
 
     initscript(L, f, file, opts, count, total);
-    if (0 == strncmp(script, "-", 2)) {
-        // Read from standard input
-        script = NULL;
-    }
-
-    if ('/' == script[0] || 0 == stat(script, &buf))
-        ret = luaL_dofile(L, script);
-    else {
-        std::string script_path = getscript(script);
-        if (0 != script_path.compare(""))
-            ret = luaL_dofile(L, script_path.c_str());
-        else {
-            std::cerr << PACKAGE": failed to find script `" << script << "'" << std::endl;
-            return 1;
-        }
-    }
+    ret = luaL_dofile(L, script);
     if (0 != ret) {
         std::cerr << PACKAGE": error running script: " << lua_tostring(L, -1) << std::endl;
         lua_pop(L, 1);

@@ -23,6 +23,9 @@
 #include <cstring>
 #include <getopt.h>
 #include <sysexits.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <fileref.h>
 #include <tag.h>
@@ -227,6 +230,27 @@ int main(int argc, char **argv)
         argv += (optind - 1);
     }
 
+    const char *script_path;
+    std::string script_str;
+    if (NULL != script) {
+        struct stat buf;
+        if (0 == strncmp(script, "-", 2)) {
+            // Read from standard input
+            script_path = NULL;
+        }
+        if ('/' == script[0] || 0 == stat(script, &buf))
+            script_path = script;
+        else {
+            script_str = getscript(script);
+            if (0 != script_str.compare(""))
+                script_path = script_str.c_str();
+            else {
+                cerr << PACKAGE": failed to find script `" << script << "'" << endl;
+                return EXIT_FAILURE;
+            }
+        }
+    }
+
     // Make sure the default encoding is UTF8
     if (!encoding_set)
         setID3v2DefaultEncoding(-1);
@@ -251,7 +275,7 @@ int main(int argc, char **argv)
                     continue;
             }
             else if (script) {
-                if (doscript(script, lstate, f, argv[i], eopts, i, argc - 1)) {
+                if (doscript(script_path, lstate, f, argv[i], eopts, i, argc - 1)) {
                     ret = EXIT_FAILURE;
                     continue;
                 }
