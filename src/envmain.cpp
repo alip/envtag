@@ -34,6 +34,7 @@ void usage(void) {
     cerr << "Commands:" << endl;
     cerr << "\tget\t\tGet tags" << endl;
     cerr << "\tset\t\tSet tags" << endl;
+    cerr << "\tprop\t\tGet audio properties" << endl;
     cerr << "\thas-xiph\tDetermine whether the file has Xiph comments" << endl;
     cerr << "Use envtag COMMAND -h to see help of a specific command." << endl;
 }

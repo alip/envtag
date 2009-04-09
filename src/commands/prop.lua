@@ -1,5 +1,5 @@
 #!/usr/bin/env lua
--- envtag get command
+-- envtag prop command
 -- vim: set ft=lua et sts=4 sw=4 ts=4 fdm=marker:
 -- Copyright 2009 Ali Polatel <polatel@gmail.com>
 -- Distributed under the terms of the GNU General Public License v2
@@ -11,20 +11,14 @@ local log = envutils.log
 local logv = envutils.logv
 
 local function usage()
-    print"envtag get -- Get tags"
-    print"Usage: envtag get [-hvne] [-t TYPE] file..."
-    print"Options:"
+    print"envtag prop -- Get audio properties"
+    print"Usage: envtag prop [-hve] [-t TYPE] file..."
     print"\t-h, --help\t\tDisplay this help"
     print"\t-v, --verbose\t\tBe verbose"
     print"\t-t TYPE, --type=TYPE\tSpecify type"
-    print"\t-n, --no-unicode\tDon't output unicode"
     print"\t-e, --export\t\tPrepend lines with export"
     print"Types:"
     print"\tflac, mpc, mpeg, vorbis, oggflac, speex, trueaudio, wavpack"
-end
-
-local function escapeq(str)
-    return string.gsub(str, "'", "'\\''")
 end
 
 local long_opts = {
@@ -33,12 +27,10 @@ local long_opts = {
     type = "t",
     export = "e",
 }
-long_opts["no-unicode"] = "n"
 
 local autype
-local unicode = true
 local export = false
-local opts, optind, optarg = alt_getopt.get_ordered_opts(arg, "hvt:ne", long_opts)
+local opts, optind, optarg = alt_getopt.get_ordered_opts(arg, "hvt:e", long_opts)
 for index, opt in ipairs(opts) do
     if "h" == opt then
         usage()
@@ -53,8 +45,6 @@ for index, opt in ipairs(opts) do
             RETVAL = 1
             return
         end
-    elseif "n" == opt then
-        unicode = false
     elseif "e" == opt then
         export = true
     end
@@ -68,19 +58,19 @@ end
 
 for i=optind,#arg do
     logv("processing `" .. arg[i] .. "'")
-    song, msg = envtag.Song(arg[i], autype, false)
+    song, msg = envtag.Song(arg[i], autype, true)
     if not song then
         log("failed to open `" .. arg[i] .. "': " .. msg)
         RETVAL = 1
     else
-        for _, tag in ipairs(envutils.TAGS_COMMON) do
-            t, msg = song:get(tag, unicode)
-            if not t then
-                log("failed to get tag `" .. tag .. "' from file `" .. arg[i] .. "': " .. msg)
-            elseif 0 == t then
-                print("unset " .. string.upper(tag))
+        for _, prop in ipairs(envutils.PROPERTIES) do
+            p, msg = song:property(prop)
+            if not p then
+                log("failed to get property `" .. prop .. "' from file `" .. arg[i] .. "': " .. msg)
+            elseif 0 == p then
+                print("unset " .. string.upper(prop))
             else
-                print(string.format("%s%s='%s'", export and "export " or "", string.upper(tag), escapeq(t)))
+                print(string.format("%s%s=%s", export and "export " or "", string.upper(prop), p))
             end
         end
     end
