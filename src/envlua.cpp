@@ -17,6 +17,7 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -51,6 +52,36 @@ struct song {
     char *path;
     FileRef *f;
 };
+
+static void dumpstack(lua_State *L)
+{
+    fprintf(stderr, "-------- Lua stack dump ---------\n");
+    for(int i = lua_gettop(L); i; i--)
+    {
+        int t = lua_type(L, i);
+        switch (t)
+        {
+          case LUA_TSTRING:
+            fprintf(stderr, "%d: string: `%s'\n", i, lua_tostring(L, i));
+            break;
+          case LUA_TBOOLEAN:
+            fprintf(stderr, "%d: bool:   %s\n", i, lua_toboolean(L, i) ? "true" : "false");
+            break;
+          case LUA_TNUMBER:
+            fprintf(stderr, "%d: number: %g\n", i, lua_tonumber(L, i));
+            break;
+          case LUA_TNIL:
+            fprintf(stderr, "%d: nil\n", i);
+            break;
+          default:
+            fprintf(stderr, "%d: %s\t#%d\t%p\n", i, lua_typename(L, t),
+                    (int) lua_objlen(L, i),
+                    lua_topointer(L, i));
+            break;
+        }
+    }
+    fprintf(stderr, "------- Lua stack dump end ------\n");
+}
 
 static int song_new(lua_State *L)
 {
@@ -268,8 +299,9 @@ static int song_set(lua_State *L)
         tnum = luaL_checkinteger(L, 3);
     else {
         const char *cval = luaL_checkstring(L, 3);
+        bool unicode = lua_toboolean(L, 4);
         if (0 != strncmp(cval, "", 1))
-            tval = String(cval);
+            tval = String(cval, unicode ? String::UTF8 : String::Latin1);
     }
 
     if (!s->f || s->f->isNull())
@@ -393,6 +425,9 @@ static int song_get_xiph(lua_State *L)
     const char *name = luaL_checkstring(L, 2);
     bool unicode = lua_toboolean(L, 3);
 
+    if (!isxiph(name))
+        return luaL_argerror(L, 2, "invalid tag");
+
     if (!s->f || s->f->isNull())
         return luaL_argerror(L, 1, "file closed");
     else if (!s->f->tag()) {
@@ -413,9 +448,6 @@ static int song_get_xiph(lua_State *L)
     }
     else
         return luaL_error(L, "no xiph comment");
-
-    if (!isxiph(name))
-        return luaL_argerror(L, 2, "invalid tag");
 
     const Ogg::FieldListMap flm = xtag->fieldListMap();
     String upname = String(name).upper();

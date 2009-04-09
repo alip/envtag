@@ -32,7 +32,7 @@ local long_opts = {
 long_opts["no-unicode"] = "n"
 
 local autype
-local unicode = false
+local unicode = true
 local opts, optind, optarg = alt_getopt.get_ordered_opts(arg, "hvt:n", long_opts)
 for index, opt in ipairs(opts) do
     if "h" == opt then
@@ -75,7 +75,7 @@ for i=optind,#arg do
     else
         for _, tag in ipairs(envutils.TAGS_COMMON) do
             if taglist[tag] then
-                song:set(tag, taglist[tag])
+                song:set(tag, taglist[tag], unicode)
             end
         end
         if not song:save() then
