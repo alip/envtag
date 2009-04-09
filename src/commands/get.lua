@@ -79,8 +79,10 @@ for i=optind,#arg do
         RETVAL = 1
     else
         for _, tag in ipairs(envutils.TAGS_COMMON) do
-            t = song:get(tag, unicode)
+            t, msg = song:get(tag, unicode)
             if not t then
+                log("failed to get tag `" .. tag .. "' from file `" .. arg[i] .. "': " .. msg)
+            elseif 0 == t then
                 print("unset " .. string.upper(tag))
             else
                 print(string.format("%s%s='%s'", export and "export " or "", string.upper(tag), escapeq(t)))
@@ -91,9 +93,7 @@ for i=optind,#arg do
                 p, msg = song:property(prop)
                 if not p then
                     log("failed to get property `" .. prop .. "' from file `" .. arg[i] .. "': " .. msg)
-                    break
-                end
-                if 0 == p then
+                elseif 0 == p then
                     print("unset " .. string.upper(prop))
                 else
                     print(string.format("%s%s=%s", export and "export " or "", string.upper(prop), p))

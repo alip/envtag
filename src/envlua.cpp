@@ -220,46 +220,38 @@ static int song_get(lua_State *L)
     Tag *tag = s->f->tag();
     if (0 == strncmp(name, "title", 6)) {
         if (String::null == tag->title())
-            lua_pushnil(L);
+            lua_pushinteger(L, 0);
         else
             lua_pushstring(L, tag->title().toCString(unicode));
     }
     else if (0 == strncmp(name, "artist", 7)) {
         if (String::null == tag->artist())
-            lua_pushnil(L);
+            lua_pushinteger(L, 0);
         else
             lua_pushstring(L, tag->artist().toCString(unicode));
     }
     else if (0 == strncmp(name, "album", 6)) {
         if (String::null == tag->album())
-            lua_pushnil(L);
+            lua_pushinteger(L, 0);
         else
             lua_pushstring(L, tag->album().toCString(unicode));
     }
     else if (0 == strncmp(name, "comment", 8)) {
         if (String::null == tag->comment())
-            lua_pushnil(L);
+            lua_pushinteger(L, 0);
         else
             lua_pushstring(L, tag->comment().toCString(unicode));
     }
     else if (0 == strncmp(name, "genre", 6)) {
         if (String::null == tag->genre())
-            lua_pushnil(L);
+            lua_pushinteger(L, 0);
         else
             lua_pushstring(L, tag->genre().toCString(unicode));
     }
-    else if (0 == strncmp(name, "year", 5)) {
-        if (0 == tag->year())
-            lua_pushnil(L);
-        else
-            lua_pushinteger(L, tag->year());
-    }
-    else if (0 == strncmp(name, "track", 6)) {
-        if (0 == tag->track())
-            lua_pushnil(L);
-        else
-            lua_pushinteger(L, tag->track());
-    }
+    else if (0 == strncmp(name, "year", 5))
+        lua_pushinteger(L, tag->year());
+    else if (0 == strncmp(name, "track", 6))
+        lua_pushinteger(L, tag->track());
     else
         return luaL_argerror(L, 1, "invalid tag");
     return 1;
