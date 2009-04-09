@@ -336,11 +336,31 @@ static int song_property(lua_State *L)
     return 1;
 }
 
+static int song_has_xiph(lua_State *L)
+{
+    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
+
+    if (!s->f || s->f->isNull())
+        return luaL_argerror(L, 1, "file closed");
+
+    File *file = s->f->file();
+    if (dynamic_cast<Ogg::File *>(file))
+        lua_pushboolean(L, 1);
+    else if (dynamic_cast<FLAC::File *>(file)) {
+        FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
+        lua_pushboolean(L, ff->xiphComment() ? 1 : 0);
+    }
+    else
+        lua_pushboolean(L, 0);
+    return 1;
+}
+
 static const luaL_reg song_methods[] = {
     {"get", song_get},
     {"set", song_set},
     {"save", song_save},
     {"property", song_property},
+    {"has_xiph", song_has_xiph},
     {"close", song_free},
     {"__gc", song_free},
     {NULL, NULL}
