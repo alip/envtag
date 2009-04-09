@@ -29,7 +29,7 @@
 
 #include <magic.h>
 
-#include "mime.hh"
+#include "envmime.hh"
 
 TagLib::File *MagicFileTypeResolver::createFile(TagLib::FileName fileName,
         bool readProperties,

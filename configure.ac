@@ -2,7 +2,7 @@ dnl vim: set sw=4 sts=4 ts=4 noet ft=config foldmethod=marker foldmarker={{{,}}}
 
 dnl {{{ program, version
 AC_PREREQ(2.59)
-AC_INIT([src/main.cpp])
+AC_INIT([src/envmain.cpp])
 
 VERSION_MAJOR=0
 VERSION_MINOR=3
@@ -82,7 +82,8 @@ AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(
 		  Makefile
 		  src/Makefile
-		  src/scripts/Makefile
+		  src/commands/Makefile
+		  src/modules/Makefile
 		  examples/Makefile
 		  examples/lua/Makefile
 		  )

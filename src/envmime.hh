@@ -17,30 +17,17 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef ENVTAG_GUARD_UTIL_HH
-#define ENVTAG_GUARD_UTIL_HH 1
+#ifndef ENVTAG_GUARD_ENVMIME_HH
+#define ENVTAG_GUARD_ENVMIME_HH 1
 
 #include <fileref.h>
 
-enum file_type {
-    TagLib_File_MPEG,
-    TagLib_File_OggVorbis,
-    TagLib_File_FLAC,
-    TagLib_File_MPC,
-    TagLib_File_OggFlac,
-    TagLib_File_WavPack,
-    TagLib_File_Speex,
-    TagLib_File_TrueAudio
+class MagicFileTypeResolver : public TagLib::FileRef::FileTypeResolver
+{
+    TagLib::File *createFile(TagLib::FileName fileName,
+            bool readAudioProperties,
+            TagLib::AudioProperties::ReadStyle audioPropertiesStyle) const;
+    ~MagicFileTypeResolver() {}
 };
 
-enum id3v2_encoding {
-  TagLib_ID3v2_Latin1,
-  TagLib_ID3v2_UTF16,
-  TagLib_ID3v2_UTF16BE,
-  TagLib_ID3v2_UTF8
-};
-
-TagLib::FileRef *openFile(const char *path, int type, bool readprops);
-void setID3v2DefaultEncoding(int encoding);
-
-#endif // ENVTAG_GUARD_UTIL_HH
+#endif // ENVTAG_GUARD_ENVMIME_HH

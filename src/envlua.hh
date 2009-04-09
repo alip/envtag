@@ -17,23 +17,15 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef ENVTAG_GUARD_DEFS_HH
-#define ENVTAG_GUARD_DEFS_HH 1
+#ifndef ENVTAG_GUARD_ENVLUA_HH
+#define ENVTAG_GUARD_ENVLUA_HH 1
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <lua.hpp>
 
 #define ENV_INIT "ENVTAG_INIT"
-#define SCRIPT_SEARCH_DIR "/.envtag/lua/"
 
-struct envtag_opts {
-    bool verbose;
-    bool unicode;
-    bool export_vars;
-    bool read_props;
-    bool append;
-    const char *delimiter;
-};
+lua_State *init_lua(void);
+void close_lua(lua_State *L);
+int docommand(lua_State *L, int argc, char **argv);
 
-#endif /* ENVTAG_GUARD_DEFS_HH */
+#endif // ENVTAG_GUARD_ENVLUA_HH

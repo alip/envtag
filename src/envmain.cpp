@@ -17,17 +17,36 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef ENVTAG_GUARD_MIME_HH
-#define ENVTAG_GUARD_MIME_HH 1
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
 
-#include <fileref.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-class MagicFileTypeResolver : public TagLib::FileRef::FileTypeResolver
+#include "envlua.hh"
+
+using namespace std;
+
+void usage(void) {
+    cerr << "Usage: "PACKAGE" COMMAND [ARGS]\n";
+}
+
+int main(int argc, char **argv)
 {
-    TagLib::File *createFile(TagLib::FileName fileName,
-            bool readAudioProperties,
-            TagLib::AudioProperties::ReadStyle audioPropertiesStyle) const;
-    ~MagicFileTypeResolver() {}
-};
+    int ret;
+    lua_State *L;
 
-#endif // ENVTAG_GUARD_MIME_HH
+    if (2 > argc) {
+        usage();
+        return EXIT_FAILURE;
+    }
+    --argc;
+    ++argv;
+
+    L = init_lua();
+    ret = docommand(L, argc, argv);
+    close_lua(L);
+    return ret;
+}
