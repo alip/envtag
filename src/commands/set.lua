@@ -9,9 +9,9 @@ require "envutils"
 
 local log = envutils.log
 local logv = envutils.logv
-envutils.log_name = "envset"
 
 local function usage()
+    print"envtag set -- Set tags"
     print"Usage: envtag set [-hvn] [-t TYPE] file..."
     print"Options:"
     print"\t-h, --help\t\tDisplay this help"
@@ -20,6 +20,8 @@ local function usage()
     print"\t-n, --no-unicode\tOperate on Latin1 strings"
     print"Types:"
     print"\tflac, mpc, mpeg, vorbis, oggflac, speex, trueaudio, wavpack"
+    print"Environment variables:"
+    print"\tTITLE, ARTIST, ALBUM, COMMENT, GENRE, YEAR, TRACK"
 end
 
 local long_opts = {

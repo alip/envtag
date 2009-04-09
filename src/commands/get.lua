@@ -1,5 +1,5 @@
 #!/usr/bin/env lua
--- envtag set command
+-- envtag get command
 -- vim: set ft=lua et sts=4 sw=4 ts=4 fdm=marker:
 -- Copyright 2009 Ali Polatel <polatel@gmail.com>
 -- Distributed under the terms of the GNU General Public License v2
@@ -9,10 +9,10 @@ require "envutils"
 
 local log = envutils.log
 local logv = envutils.logv
-envutils.log_name = "envget"
 
 local function usage()
-    print"Usage: envget [-hvnep] [-t TYPE] file..."
+    print"envtag get -- Get tags"
+    print"Usage: envtag get [-hvnep] [-t TYPE] file..."
     print"Options:"
     print"\t-h, --help\t\tDisplay this help"
     print"\t-v, --verbose\t\tBe verbose"
