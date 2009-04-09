@@ -355,12 +355,101 @@ static int song_has_xiph(lua_State *L)
     return 1;
 }
 
+static inline bool isxiph(const char *tag)
+{
+    if (0 == strncmp(tag, "title", 6))
+        return true;
+    else if (0 == strncmp(tag, "version", 8))
+        return true;
+    else if (0 == strncmp(tag, "album", 6))
+        return true;
+    else if (0 == strncmp(tag, "artist", 7))
+        return true;
+    else if (0 == strncmp(tag, "performer", 10))
+        return true;
+    else if (0 == strncmp(tag, "copyright", 10))
+        return true;
+    else if (0 == strncmp(tag, "organization", 13))
+        return true;
+    else if (0 == strncmp(tag, "description", 12))
+        return true;
+    else if (0 == strncmp(tag, "genre", 6))
+        return true;
+    else if (0 == strncmp(tag, "date", 5))
+        return true;
+    else if (0 == strncmp(tag, "location", 9))
+        return true;
+    else if (0 == strncmp(tag, "contact", 8))
+        return true;
+    else if (0 == strncmp(tag, "isrc", 5))
+        return true;
+    else
+        return false;
+}
+
+static int song_get_xiph(lua_State *L)
+{
+    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
+    const char *name = luaL_checkstring(L, 2);
+    bool unicode = lua_toboolean(L, 3);
+
+    if (!s->f || s->f->isNull())
+        return luaL_argerror(L, 1, "file closed");
+    else if (!s->f->tag()) {
+        lua_pushnil(L);
+        lua_pushstring(L, "no tag");
+        return 2;
+    }
+
+    File *file = s->f->file();
+    Ogg::XiphComment *xtag;
+    if (dynamic_cast<Ogg::File *>(file))
+        xtag = dynamic_cast<Ogg::XiphComment *>(s->f->tag());
+    else if (dynamic_cast<FLAC::File *>(file)) {
+        FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
+        if (!ff->xiphComment())
+            return luaL_error(L, "no xiph comment");
+        xtag = ff->xiphComment();
+    }
+    else
+        return luaL_error(L, "no xiph comment");
+
+    if (!isxiph(name))
+        return luaL_argerror(L, 2, "invalid tag");
+
+    const Ogg::FieldListMap flm = xtag->fieldListMap();
+    String upname = String(name).upper();
+    if (!xtag->contains(upname)) {
+        lua_pushinteger(L, 0);
+        return 1;
+    }
+
+    int tableind = 1;
+    lua_newtable(L);
+    StringList::ConstIterator valuesIt = flm[upname].begin();
+    for (; valuesIt != flm[upname].end(); valuesIt++) {
+        ByteVector vect = (*valuesIt).data(unicode ? String::UTF8 : String::Latin1);
+        /* Make sure the data is NULL terminated */
+        const char *data = vect.data();
+        char *datac = strndup(data, vect.size());
+        if (NULL == datac)
+            return luaL_error(L, "out of memory");
+        datac[vect.size()] = '\0';
+        lua_pushinteger(L, tableind++);
+        lua_pushstring(L, datac);
+        lua_settable(L, -3);
+        free(datac);
+    }
+    return 1;
+}
+
 static const luaL_reg song_methods[] = {
     {"get", song_get},
     {"set", song_set},
     {"save", song_save},
     {"property", song_property},
     {"has_xiph", song_has_xiph},
+    {"get_xiph", song_get_xiph},
     {"close", song_free},
     {"__gc", song_free},
     {NULL, NULL}

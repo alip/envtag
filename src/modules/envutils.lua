@@ -6,9 +6,10 @@
 
 local unpack = unpack
 
+local string = string
+local table = table
 local io = io
 local os = os
-local table = table
 
 module "envutils"
 
@@ -24,10 +25,18 @@ function logv(...)
     if log_verbose then log(unpack(arg)) end
 end
 
+function escapeq(src)
+    return string.gsub(src, "'", "'\\''")
+end
+
 TAGS_COMMON = {
     "title", "artist", "album", "comment",
     "genre", "year", "track"
 }
-
+TAGS_XIPH = {
+    "title", "version", "album", "artist",
+    "performer", "copyright", "organization", "description",
+    "genre", "date", "location", "contact", "isrc"
+}
 PROPERTIES = {"length", "bitrate", "samplerate", "channels"}
 
