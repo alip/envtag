@@ -311,6 +311,8 @@ static int song_set(lua_State *L)
 static int song_save(lua_State *L)
 {
     struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
+    if (!s->f || s->f->isNull())
+        return luaL_argerror(L, 1, "file closed");
     lua_pushboolean(L, s->f->save() ? 1 : 0);
     return 1;
 }
