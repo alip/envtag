@@ -29,7 +29,17 @@
 
 using namespace std;
 
+void about(void) {
+    cerr << PACKAGE"-"VERSION;
+#if defined(GITHEAD)
+    if (0 != strlen(GITHEAD))
+        cerr << "-"GITHEAD;
+#endif
+    cerr << endl;
+}
+
 void usage(void) {
+    cerr << PACKAGE" -- Simple audio tagger" << endl;
     cerr << "Usage: "PACKAGE" COMMAND [ARGS]" << endl;
     cerr << "Commands:" << endl;
     cerr << "\tget\t\tGet tags" << endl;
@@ -48,8 +58,18 @@ int main(int argc, char **argv)
         usage();
         return EXIT_FAILURE;
     }
-    --argc;
-    ++argv;
+    else if (0 == strncmp(argv[1], "-h", 3) || 0 == strncmp(argv[1], "--help", 7)) {
+        usage();
+        return EXIT_SUCCESS;
+    }
+    else if (0 == strncmp(argv[1], "-V", 3) || 0 == strncmp(argv[1], "--version", 10)) {
+        about();
+        return EXIT_SUCCESS;
+    }
+    else {
+        --argc;
+        ++argv;
+    }
 
     L = init_lua();
     ret = docommand(L, argc, argv);
