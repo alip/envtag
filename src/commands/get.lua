@@ -40,7 +40,7 @@ long_opts["no-unicode"] = "n"
 local autype
 local unicode = true
 local export = false
-local props = false
+local getprop = false
 local opts, optind, optarg = alt_getopt.get_ordered_opts(arg, "hvt:nep", long_opts)
 for index, opt in ipairs(opts) do
     if "h" == opt then
@@ -61,7 +61,7 @@ for index, opt in ipairs(opts) do
     elseif "e" == opt then
         export = true
     elseif "p" == opt then
-        props = true
+        getprop = true
     end
 end
 
@@ -73,7 +73,7 @@ end
 
 for i=optind,#arg do
     logv("processing `" .. arg[i] .. "'")
-    song, msg = envtag.Song(arg[i], autype, props)
+    song, msg = envtag.Song(arg[i], autype, getprop)
     if not song then
         log("failed to open `" .. arg[i] .. "': " .. msg)
         RETVAL = 1
@@ -84,6 +84,20 @@ for i=optind,#arg do
                 print("unset " .. string.upper(tag))
             else
                 print(string.format("%s%s='%s'", export and "export " or "", string.upper(tag), escapeq(t)))
+            end
+        end
+        if getprop then
+            for _, prop in ipairs(envutils.PROPERTIES) do
+                p, msg = song:property(prop)
+                if not p then
+                    log("failed to get property `" .. prop .. "' from file `" .. arg[i] .. "': " .. msg)
+                    break
+                end
+                if 0 == p then
+                    print("unset " .. string.upper(prop))
+                else
+                    print(string.format("%s%s=%s", export and "export " or "", string.upper(prop), p))
+                end
             end
         end
     end

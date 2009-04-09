@@ -317,10 +317,38 @@ static int song_save(lua_State *L)
     return 1;
 }
 
+static int song_property(lua_State *L)
+{
+    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
+    const char *name = luaL_checkstring(L, 2);
+
+    if (!s->f || s->f->isNull())
+        return luaL_argerror(L, 1, "file closed");
+    if (!s->f->audioProperties()) {
+        lua_pushnil(L);
+        lua_pushstring(L, "no audio property");
+        return 2;
+    }
+
+    AudioProperties *props = s->f->audioProperties();
+    if (0 == strncmp(name, "length", 7))
+        lua_pushinteger(L, props->length());
+    else if (0 == strncmp(name, "bitrate", 8))
+        lua_pushinteger(L, props->bitrate());
+    else if (0 == strncmp(name, "samplerate", 11))
+        lua_pushinteger(L, props->sampleRate());
+    else if (0 == strncmp(name, "channels", 9))
+        lua_pushinteger(L, props->channels());
+    else
+        return luaL_argerror(L, 2, "invalid audio property");
+    return 1;
+}
+
 static const luaL_reg song_methods[] = {
     {"get", song_get},
     {"set", song_set},
     {"save", song_save},
+    {"property", song_property},
     {"close", song_free},
     {"__gc", song_free},
     {NULL, NULL}

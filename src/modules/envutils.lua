@@ -28,3 +28,6 @@ TAGS_COMMON = {
     "title", "artist", "album", "comment",
     "genre", "year", "track"
 }
+
+PROPERTIES = {"length", "bitrate", "samplerate", "channels"}
+
