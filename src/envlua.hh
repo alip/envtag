@@ -23,6 +23,7 @@
 #include <lua.hpp>
 
 #define ENV_INIT "ENVTAG_INIT"
+#define EXTRA_COMMAND_DIR "/.envtag/"
 
 lua_State *init_lua(void);
 void close_lua(lua_State *L);

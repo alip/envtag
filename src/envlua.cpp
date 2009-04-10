@@ -17,6 +17,10 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <errno.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -541,6 +545,45 @@ static const luaL_reg envtag_methods[] = {
     {NULL, NULL}
 };
 
+static inline bool iscommand(const char *name)
+{
+    if (0 == strncmp(name, "get", 4))
+        return true;
+    else if (0 == strncmp(name, "set", 4))
+        return true;
+    else if (0 == strncmp(name, "has-xiph", 9))
+        return true;
+    else if (0 == strncmp(name, "get-xiph", 9))
+        return true;
+    else if (0 == strncmp(name, "set-xiph", 9))
+        return true;
+    else
+        return false;
+}
+
+static std::string userpath(const char *name)
+{
+    std::string upath = "";
+    char *home = getenv("HOME");
+    if (NULL == home) {
+        uid_t uid;
+        struct passwd *pwd;
+
+        uid = geteuid();
+        errno = 0;
+        pwd = getpwuid(uid);
+
+        if (0 != errno)
+            return upath;
+        home = pwd->pw_name;
+    }
+    upath += home;
+    upath += EXTRA_COMMAND_DIR;
+    upath += name;
+    upath += ".lua";
+    return upath;
+}
+
 lua_State *init_lua(void)
 {
     lua_State *L = lua_open();
@@ -590,6 +633,7 @@ void close_lua(lua_State *L)
 int docommand(lua_State *L, int argc, char **argv)
 {
     int ret;
+    std::string path;
 
     // command line args to Lua
     lua_newtable(L);
@@ -600,7 +644,15 @@ int docommand(lua_State *L, int argc, char **argv)
     }
     lua_setglobal(L, "arg");
 
-    std::string path = LIBEXECDIR"/"PACKAGE"/commands/" + std::string(argv[0]) + ".lua";
+    if (iscommand(argv[0]))
+        path = LIBEXECDIR"/"PACKAGE"/commands/" + std::string(argv[0]) + ".lua";
+    else {
+        path = userpath(argv[0]);
+        if (0 == path.compare("")) {
+            std::cerr << PACKAGE": getpwuid() failed: " << strerror(errno) << std::endl;
+            return EXIT_FAILURE;
+        }
+    }
     ret = luaL_dofile(L, path.c_str());
     if (0 != ret) {
         std::cerr << PACKAGE": " << lua_tostring(L, -1) << std::endl;

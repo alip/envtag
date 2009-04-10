@@ -40,7 +40,7 @@ void about(void) {
 
 void usage(void) {
     cerr << PACKAGE" -- Simple audio tagger" << endl;
-    cerr << "Usage: "PACKAGE" COMMAND [ARGS]" << endl;
+    cerr << "Usage: "PACKAGE" COMMAND [ARGS]" << endl << endl;
     cerr << "Commands:" << endl;
     cerr << "\tget\t\tGet tags" << endl;
     cerr << "\tset\t\tSet tags" << endl;
@@ -48,9 +48,11 @@ void usage(void) {
     cerr << "\thas-xiph\tDetermine whether the file has Xiph comments" << endl;
     cerr << "\tget-xiph\tGet Xiph comments" << endl;
     cerr << "\tset-xiph\tSet Xiph comments" << endl;
+    cerr << "See 'envtag COMMAND -h' for more information on a specific command." << endl << endl;
     cerr << "Environment variables:" << endl;
-    cerr << "\t"ENV_INIT":\tRun initialization code or load from file simiar to LUA_INIT" << endl;
-    cerr << "See 'envtag COMMAND -h' for more information on a specific command." << endl;
+    cerr << "\t"ENV_INIT":\tRun initialization code or load from file simiar to LUA_INIT" << endl << endl;
+    cerr << "Directories:" << endl;
+    cerr << "\t~"EXTRA_COMMAND_DIR":\tDirectory for extra commands" << endl;
 }
 
 int main(int argc, char **argv)
