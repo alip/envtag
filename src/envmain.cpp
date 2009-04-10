@@ -48,7 +48,9 @@ void usage(void) {
     cerr << "\thas-xiph\tDetermine whether the file has Xiph comments" << endl;
     cerr << "\tget-xiph\tGet Xiph comments" << endl;
     cerr << "\tset-xiph\tSet Xiph comments" << endl;
-    cerr << "Use envtag COMMAND -h to see help of a specific command." << endl;
+    cerr << "Environment variables:" << endl;
+    cerr << "\t"ENV_INIT":\tRun initialization code or load from file simiar to LUA_INIT" << endl;
+    cerr << "See 'envtag COMMAND -h' for more information on a specific command." << endl;
 }
 
 int main(int argc, char **argv)

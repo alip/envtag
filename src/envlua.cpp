@@ -558,6 +558,23 @@ lua_State *init_lua(void)
         std::cerr << PACKAGE": error adding envtag module directory to package.path: " \
             << lua_tostring(L, -1) << std::endl;
 
+    // Initialize using ENV_INIT
+    char *init = getenv(ENV_INIT);
+    if (NULL != init) {
+        if ('@' == init[0]) {
+            ++init;
+            if (0 != luaL_dofile(L, init)) {
+                std::cerr << PACKAGE": error running init script `" << init << "': " \
+                    << lua_tostring(L, -1) << std::endl;
+                lua_pop(L, 1);
+            }
+        }
+        else if (0 != luaL_dostring(L, init)) {
+            std::cerr << PACKAGE": error running init code: " << lua_tostring(L, -1) << std::endl;
+            lua_pop(L, 1);
+        }
+    }
+
 #ifdef ENABLE_MAGIC
     FileRef::addFileTypeResolver(new MagicFileTypeResolver);
 #endif
