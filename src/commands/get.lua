@@ -64,7 +64,7 @@ if optind > #arg then
 end
 
 for i=optind,#arg do
-    logv("processing `%s'", arg[i])
+    logv("processing %d of %d: `%s'", i - optind + 1, #arg - optind + 1, arg[i])
     song, msg = envtag.Song(arg[i], autype, false)
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
