@@ -475,6 +475,54 @@ static int song_get_xiph(lua_State *L)
     return 1;
 }
 
+static int song_set_xiph(lua_State *L)
+{
+    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
+    const char *name = luaL_checkstring(L, 2);
+    bool append = lua_toboolean(L, 4);
+    bool unicode = lua_toboolean(L, 5);
+
+    if (!isxiph(name))
+        return luaL_argerror(L, 2, "invalid tag");
+    if (!lua_istable(L, 3))
+        return luaL_argerror(L, 3, "not a table");
+
+    if (!s->f || s->f->isNull())
+        return luaL_argerror(L, 1, "file closed");
+    else if (!s->f->tag()) {
+        lua_pushnil(L);
+        lua_pushstring(L, "no tag");
+        return 2;
+    }
+
+    File *file = s->f->file();
+    Ogg::XiphComment *xtag;
+    if (dynamic_cast<Ogg::File *>(file))
+        xtag = dynamic_cast<Ogg::XiphComment *>(s->f->tag());
+    else if (dynamic_cast<FLAC::File *>(file)) {
+        FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
+        if (!ff->xiphComment())
+            return luaL_error(L, "no xiph comment");
+        xtag = ff->xiphComment();
+    }
+    else
+        return luaL_error(L, "no xiph comment");
+
+    String upname = String(name).upper();
+    lua_pushnil(L);
+    while (0 != lua_next(L, -4)) {
+        const char *value = luaL_checkstring(L, -1);
+        String svalue;
+        if (0 == strncmp(value, "", 1))
+            svalue = String::null;
+        else
+            svalue = String(value, unicode ? String::UTF8 : String::Latin1);
+        xtag->addField(upname, svalue, !append);
+        lua_pop(L, 1);
+    }
+    return 0;
+}
+
 static const luaL_reg song_methods[] = {
     {"get", song_get},
     {"set", song_set},
@@ -482,6 +530,7 @@ static const luaL_reg song_methods[] = {
     {"property", song_property},
     {"has_xiph", song_has_xiph},
     {"get_xiph", song_get_xiph},
+    {"set_xiph", song_set_xiph},
     {"close", song_free},
     {"__gc", song_free},
     {NULL, NULL}

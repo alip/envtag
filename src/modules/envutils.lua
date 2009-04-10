@@ -29,6 +29,25 @@ function escapeq(src)
     return string.gsub(src, "'", "'\\''")
 end
 
+function split(src, char)
+    local chunk = ""
+    local list = {}
+    local i = 1
+
+    while i <= #src do
+        local c = string.sub(src, i, i)
+        if c == char then
+            table.insert(list, chunk)
+            chunk = ""
+        else
+            chunk = chunk .. c
+        end
+        i = i + 1
+    end
+    table.insert(list, chunk)
+    return list
+end
+
 TAGS_COMMON = {
     "title", "artist", "album", "comment",
     "genre", "year", "track"
