@@ -67,10 +67,10 @@ for _, tag in ipairs(envutils.TAGS_COMMON) do
 end
 
 for i=optind,#arg do
-    logv("processing `" .. arg[i] .. "'")
+    logv("processing `%s'", arg[i])
     song, msg = envtag.Song(arg[i], autype, false)
     if not song then
-        log("failed to open `" .. arg[i] .. "': " .. msg)
+        log("failed to open `%s': %s", arg[i], msg)
         RETVAL=1
     else
         for _, tag in ipairs(envutils.TAGS_COMMON) do
@@ -79,7 +79,7 @@ for i=optind,#arg do
             end
         end
         if not song:save() then
-            log("failed to save `" .. arg[i] .. "'")
+            log("failed to save `%s'", arg[i])
             RETVAL=1
         end
     end

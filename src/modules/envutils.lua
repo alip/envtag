@@ -17,12 +17,14 @@ log_name = "envtag"
 log_timestamp = "%s"
 log_verbose = false
 
-function log(...)
-    io.stderr:write(log_name .. "@" .. os.date(log_timestamp) .. ": " .. table.concat(arg) .. "\n")
+function log(fmt, ...)
+    io.stderr:write(log_name .. "@" .. os.date(log_timestamp) .. ": ")
+    io.stderr:write(string.format(fmt, unpack(arg)))
+    io.stderr:write"\n"
 end
 
-function logv(...)
-    if log_verbose then log(unpack(arg)) end
+function logv(fmt, ...)
+    if log_verbose then log(fmt, unpack(arg)) end
 end
 
 function escapeq(src)

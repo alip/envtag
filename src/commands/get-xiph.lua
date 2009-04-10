@@ -61,12 +61,12 @@ for index, opt in ipairs(opts) do
         if optarg[index] then
             delim = optarg[index]
             if 1 ~= delim then
-                log("delimiter must be a single character")
+                log"delimiter must be a single character"
                 RETVAL = 1
                 return
             end
         else
-            log("-d option requires an argument")
+            log"-d option requires an argument"
             RETVAL = 1
             return
         end
@@ -80,19 +80,19 @@ if optind > #arg then
 end
 
 for i=optind,#arg do
-    logv("processing `" .. arg[i] .. "'")
+    logv("processing `%s'", arg[i])
     song, msg = envtag.Song(arg[i], autype, false)
     if not song then
-        log("failed to open `" .. arg[i] .. "': " .. msg)
+        log("failed to open `%s': %s", arg[i], msg)
         RETVAL = 1
     elseif not song:has_xiph() then
-        log("file `" .. arg[i] .. "' has no xiph comments")
+        log("file `%s' has no xiph comments", arg[i])
         RETVAL = 1
     else
         for _, tag in ipairs(envutils.TAGS_XIPH) do
             t, msg = song:get_xiph(tag, unicode)
             if not t then
-                log("failed to get tag `" .. tag .. "' from file `" .. arg[i] .. "': " .. msg)
+                log("failed to get xiph comment `%s' from file `%s': %s", tag, arg[i], msg)
             elseif 0 == t then
                 print("unset " .. string.upper(tag))
             else

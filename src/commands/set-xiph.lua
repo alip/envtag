@@ -52,7 +52,7 @@ for index, opt in ipairs(opts) do
         if optarg[index] then
             autype = optarg[index]
         else
-            log("-t option requires an argument")
+            log"-t option requires an argument"
             return 1
         end
     elseif "a" == opt then
@@ -61,12 +61,12 @@ for index, opt in ipairs(opts) do
         if optarg[index] then
             delim = optarg[index]
             if 1 ~= delim then
-                log("delimiter must be a single character")
+                log"delimiter must be a single character"
                 RETVAL = 1
                 return
             end
         else
-            log("-d option requires an argument")
+            log"-d option requires an argument"
             RETVAL = 1
             return
         end
@@ -81,22 +81,19 @@ if optind > #arg then
     return
 end
 
-taglist = {}
-for _, tag in ipairs(envutils.TAGS_COMMON) do
+local taglist = {}
+for _, tag in ipairs(envutils.TAGS_XIPH) do
     taglist[tag] = os.getenv(string.upper(tag))
-    if tag == "year" or tag == "track" then
-        taglist[tag] = taglist[tag] == "" and 0 or tonumber(taglist[tag])
-    end
 end
 
 for i=optind,#arg do
-    logv("processing `" .. arg[i] .. "'")
+    logv("processing `%s'", arg[i])
     song, msg = envtag.Song(arg[i], autype, false)
     if not song then
-        log("failed to open `" .. arg[i] .. "': " .. msg)
+        log("failed to open `%s': %s", arg[i], msg)
         RETVAL=1
     elseif not song:has_xiph() then
-        log("file `" .. arg[i] .. "' has no xiph comments")
+        log("file `%s' has no xiph comments", arg[i])
         RETVAL = 1
     else
         for _, tag in ipairs(envutils.TAGS_XIPH) do
@@ -106,7 +103,7 @@ for i=optind,#arg do
             end
         end
         if not song:save() then
-            log("failed to save `" .. arg[i] .. "'")
+            log("failed to save `%s'", arg[i])
             RETVAL=1
         end
     end
