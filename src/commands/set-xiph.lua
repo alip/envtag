@@ -12,8 +12,8 @@ local logv = envutils.logv
 local split = envutils.split
 
 local function usage()
-    print"envtag set -- Set tags"
-    print"Usage: envtag set [-hvn] [-t TYPE] file..."
+    print"envtag set-xiph -- Set Xiph comments"
+    print"Usage: envtag set-xiph [-hvan] [-t TYPE] [-d DELIM] file..."
     print"Options:"
     print"\t-h, --help\t\tDisplay this help"
     print"\t-v, --verbose\t\tBe verbose"
