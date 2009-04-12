@@ -100,6 +100,7 @@ for i=optind,#arg do
                     escapeq(table.concat(t, delim))))
             end
         end
+        song:close()
     end
 end
 

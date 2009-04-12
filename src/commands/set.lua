@@ -82,6 +82,7 @@ for i=optind,#arg do
             log("failed to save `%s'", arg[i])
             RETVAL=1
         end
+        song:close()
     end
 end
 

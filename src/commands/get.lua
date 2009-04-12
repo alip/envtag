@@ -80,6 +80,7 @@ for i=optind,#arg do
                 print(string.format("%s%s='%s'", export and "export " or "", string.upper(tag), escapeq(t)))
             end
         end
+        song:close()
     end
 end
 
