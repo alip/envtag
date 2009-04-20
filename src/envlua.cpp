@@ -557,6 +557,8 @@ static inline bool iscommand(const char *name)
         return true;
     else if (0 == strncmp(name, "set-xiph", 9))
         return true;
+    else if (0 == strncmp(name, "stats", 6))
+        return true;
     else
         return false;
 }
