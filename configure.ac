@@ -85,6 +85,5 @@ AC_OUTPUT(
 		  src/commands/Makefile
 		  src/modules/Makefile
 		  examples/Makefile
-		  examples/lua/Makefile
 		  )
 dnl }}}
