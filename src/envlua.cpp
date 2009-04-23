@@ -42,10 +42,6 @@
 #include "config.h"
 #endif
 
-#ifdef ENABLE_MAGIC
-#include "envmime.hh"
-#endif
-
 #include "envlua.hh"
 
 using namespace TagLib;
@@ -622,10 +618,6 @@ lua_State *init_lua(void)
             lua_pop(L, 1);
         }
     }
-
-#ifdef ENABLE_MAGIC
-    FileRef::addFileTypeResolver(new MagicFileTypeResolver);
-#endif
 
     return L;
 }

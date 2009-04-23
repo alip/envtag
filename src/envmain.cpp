@@ -21,11 +21,16 @@
 #include <cstring>
 #include <iostream>
 
+#include <fileref.h>
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "envlua.hh"
+#ifdef ENABLE_MAGIC
+#include "envmime.hh"
+#endif
 
 using namespace std;
 
@@ -77,6 +82,10 @@ int main(int argc, char **argv)
         --argc;
         ++argv;
     }
+
+#ifdef ENABLE_MAGIC
+    TagLib::FileRef::addFileTypeResolver(new MagicFileTypeResolver);
+#endif
 
     L = init_lua();
     ret = docommand(L, argc, argv);
