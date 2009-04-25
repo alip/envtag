@@ -93,8 +93,10 @@ for i=optind,#arg do
             t, msg = song:get_xiph(tag, unicode)
             if not t then
                 log("failed to get xiph comment `%s' from file `%s': %s", tag, arg[i], msg)
+            --[[
             elseif 0 == t then
                 print("unset " .. string.upper(tag))
+            --]]
             else
                 print(string.format("%s%s='%s'", export and "export " or "", string.upper(tag),
                     escapeq(table.concat(t, delim))))
