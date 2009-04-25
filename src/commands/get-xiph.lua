@@ -97,7 +97,7 @@ for i=optind,#arg do
             elseif 0 == t then
                 print("unset " .. string.upper(tag))
             --]]
-            else
+            elseif 0 != t then
                 print(string.format("%s%s='%s'", export and "export " or "", string.upper(tag),
                     escapeq(table.concat(t, delim))))
             end
