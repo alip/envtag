@@ -1,0 +1,38 @@
+#!/bin/bash
+# vim: set sw=4 et sts=4 tw=80 :
+# Copyright 2009 Ali Polatel <polatel@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+# Convert a flac file to an ogg file keeping tag information.
+# This example demonstrates the usage of envtag get --export.
+
+# additional options to pass to oggenc
+oggenc_opts="-q 4"
+
+if [[ 1 > $# || "${1}" == "-h" || "${1}" == "--help" ]]; then
+    echo "usage: $(basename ${0}) file.flac" >&2
+    exit 1
+else
+    fflac="${1}"
+    fogg="${1/.flac/.ogg}"
+    if [[ "${fflac}" == "${fogg}" ]]; then
+        echo "invalid file (make sure file's extension is flac)" >&2
+        exit 1
+    fi
+fi
+
+flac="$(type -P flac 2>/dev/null)"
+if [[ -z "${flac}" ]]; then
+    echo "flac not found in PATH" >&2
+    exit 1
+fi
+oggenc="$(type -P oggenc 2>/dev/null)"
+if [[ -z "${oggenc}" ]]; then
+    echo "oggenc not found in PATH" >&2
+    exit 1
+fi
+
+echo "${fflac} -> ${fogg}" >&2
+eval `envtag get --export --verbose "${fflac}"`
+${flac} --decode --stdout "${fflac}" - | ${oggenc} "${oggenc_opts}" -o "${fogg}" -
+envtag set --verbose "${fogg}"
