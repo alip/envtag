@@ -547,6 +547,8 @@ static inline bool iscommand(const char *name)
         return true;
     else if (0 == strncmp(name, "set", 4))
         return true;
+    else if (0 == strncmp(name, "prop", 5))
+        return true;
     else if (0 == strncmp(name, "has-xiph", 9))
         return true;
     else if (0 == strncmp(name, "get-xiph", 9))
