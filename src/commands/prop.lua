@@ -67,9 +67,10 @@ for i=optind,#arg do
             p, msg = song:property(prop)
             if not p then
                 log("failed to get property `%s' from file `%s': %s", prop, arg[i], msg)
-            elseif 0 == p then
+            --[[ elseif 0 == p then
                 print("unset " .. string.upper(prop))
-            else
+            --]]
+            elseif 0 ~= p then
                 print(string.format("%s%s=%s", export and "export " or "", string.upper(prop), p))
             end
         end
