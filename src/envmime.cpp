@@ -42,8 +42,11 @@ TagLib::File *MagicFileTypeResolver::createFile(TagLib::FileName fileName,
         db = magic_open(MAGIC_NONE);
         if (NULL == db)
             return 0;
-        if (0 > magic_load(db, NULL))
+        if (0 > magic_load(db, NULL)) {
+            magic_close(db);
+            db = NULL;
             return 0;
+        }
     }
 
     desc = magic_file(db, fileName);
