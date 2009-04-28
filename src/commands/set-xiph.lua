@@ -19,7 +19,7 @@ local function usage()
     print"\t-v, --verbose\t\tBe verbose"
     print"\t-t TYPE, --type=TYPE\tSpecify type"
     print"\t-d DELIM, --delimiter=DELIM\n\t\t\t\tSpecify delimiter for multiple tags (default is '=')"
-    print"\t-a, --append\tAppend tags instead of replacing"
+    print"\t-a, --append\t\tAppend tags instead of replacing"
     print"\t-n, --no-unicode\tOperate on Latin1 strings"
     print"Types:"
     print"\tflac, mpc, mpeg, vorbis, oggflac, speex, trueaudio, wavpack"
