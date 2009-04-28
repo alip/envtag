@@ -50,7 +50,6 @@ void usage(void) {
     cerr << "\tget\t\tGet tags" << endl;
     cerr << "\tset\t\tSet tags" << endl;
     cerr << "\tprop\t\tGet audio properties" << endl;
-    cerr << "\thas-xiph\tDetermine whether the file has Xiph comments" << endl;
     cerr << "\tget-xiph\tGet Xiph comments" << endl;
     cerr << "\tset-xiph\tSet Xiph comments" << endl;
     cerr << "\tstats\t\tShow statistics" << endl;
