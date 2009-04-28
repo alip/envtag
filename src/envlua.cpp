@@ -442,9 +442,13 @@ static int song_get_xiph(lua_State *L)
         xtag = dynamic_cast<Ogg::XiphComment *>(s->f->tag());
     else if (dynamic_cast<FLAC::File *>(file)) {
         FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
-        if (!ff->xiphComment())
-            return luaL_error(L, "no xiph comment");
-        xtag = ff->xiphComment();
+        if (!ff->xiphComment()) {
+            lua_pushnil(L);
+            lua_pushstring(L, "no xiph comment");
+            return 2;
+        }
+        else
+            xtag = ff->xiphComment();
     }
     else
         return luaL_error(L, "no xiph comment");
@@ -501,9 +505,7 @@ static int song_set_xiph(lua_State *L)
         xtag = dynamic_cast<Ogg::XiphComment *>(s->f->tag());
     else if (dynamic_cast<FLAC::File *>(file)) {
         FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
-        if (!ff->xiphComment())
-            return luaL_error(L, "no xiph comment");
-        xtag = ff->xiphComment();
+        xtag = ff->xiphComment(true);
     }
     else
         return luaL_error(L, "no xiph comment");
