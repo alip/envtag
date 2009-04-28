@@ -45,7 +45,7 @@ local opts, optind, optarg = alt_getopt.get_ordered_opts(arg, "hvt:ad:n", long_o
 for index, opt in ipairs(opts) do
     if "h" == opt then
         usage()
-        return 0
+        return
     elseif "v" == opt then
         envutils.log_verbose = true
     elseif "t" == opt then
@@ -53,7 +53,8 @@ for index, opt in ipairs(opts) do
             autype = optarg[index]
         else
             log"-t option requires an argument"
-            return 1
+            RETVAL = 1
+            return
         end
     elseif "a" == opt then
         append = true
@@ -77,7 +78,7 @@ end
 
 if optind > #arg then
     log"no file given"
-    RETVAL=1
+    RETVAL = 1
     return
 end
 
@@ -92,9 +93,6 @@ for i=optind,#arg do
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
         RETVAL=1
-    elseif not song:has_xiph() then
-        log("file `%s' has no xiph comments", arg[i])
-        RETVAL = 1
     else
         for _, tag in ipairs(envutils.TAGS_XIPH) do
             local t = os.getenv(string.upper(tag))
@@ -104,7 +102,7 @@ for i=optind,#arg do
         end
         if not song:save() then
             log("failed to save `%s'", arg[i])
-            RETVAL=1
+            RETVAL = 1
         end
         song:close()
     end
