@@ -431,8 +431,11 @@ static int song_get_xiph(lua_State *L)
         else
             xtag = ff->xiphComment();
     }
-    else
-        return luaL_error(L, "no xiph comment");
+    else {
+        lua_pushnil(L);
+        lua_pushstring(L, "no xiph comment");
+        return 2;
+    }
 
     const Ogg::FieldListMap flm = xtag->fieldListMap();
     String upname = String(name).upper();
@@ -488,8 +491,11 @@ static int song_set_xiph(lua_State *L)
         FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
         xtag = ff->xiphComment(true);
     }
-    else
-        return luaL_error(L, "no xiph comment");
+    else {
+        lua_pushnil(L);
+        lua_pushstring(L, "no xiph comment");
+        return 2;
+    }
 
     String upname = String(name).upper();
     lua_pushnil(L);

@@ -85,18 +85,12 @@ for i=optind,#arg do
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
         RETVAL = 1
-    elseif not song:has_xiph() then
-        log("file `%s' has no xiph comments", arg[i])
-        RETVAL = 1
     else
         for _, tag in ipairs(envutils.TAGS_XIPH) do
             t, msg = song:get_xiph(tag, unicode)
             if not t then
                 log("failed to get xiph comment `%s' from file `%s': %s", tag, arg[i], msg)
-            --[[
-            elseif 0 == t then
-                print("unset " .. string.upper(tag))
-            --]]
+                RETVAL = 1
             elseif 0 ~= t then
                 print(string.format("%s%s='%s'", export and "export " or "", string.upper(tag),
                     escapeq(table.concat(t, delim))))
