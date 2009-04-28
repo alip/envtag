@@ -368,25 +368,6 @@ static int song_property(lua_State *L)
     return 1;
 }
 
-static int song_has_xiph(lua_State *L)
-{
-    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
-
-    if (!s->f || s->f->isNull())
-        return luaL_argerror(L, 1, "file closed");
-
-    File *file = s->f->file();
-    if (dynamic_cast<Ogg::File *>(file))
-        lua_pushboolean(L, 1);
-    else if (dynamic_cast<FLAC::File *>(file)) {
-        FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
-        lua_pushboolean(L, ff->xiphComment() ? 1 : 0);
-    }
-    else
-        lua_pushboolean(L, 0);
-    return 1;
-}
-
 static inline bool isxiph(const char *tag)
 {
     if (0 == strncmp(tag, "title", 6))
@@ -530,7 +511,6 @@ static const luaL_reg song_methods[] = {
     {"set", song_set},
     {"save", song_save},
     {"property", song_property},
-    {"has_xiph", song_has_xiph},
     {"get_xiph", song_get_xiph},
     {"set_xiph", song_set_xiph},
     {"close", song_free},
@@ -550,8 +530,6 @@ static inline bool iscommand(const char *name)
     else if (0 == strncmp(name, "set", 4))
         return true;
     else if (0 == strncmp(name, "prop", 5))
-        return true;
-    else if (0 == strncmp(name, "has-xiph", 9))
         return true;
     else if (0 == strncmp(name, "get-xiph", 9))
         return true;
