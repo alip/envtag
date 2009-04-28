@@ -558,7 +558,6 @@ static std::string userpath(const char *name)
         uid = geteuid();
         errno = 0;
         pwd = getpwuid(uid);
-
         if (0 != errno)
             return upath;
         home = pwd->pw_name;
