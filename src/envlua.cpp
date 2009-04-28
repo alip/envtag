@@ -449,16 +449,9 @@ static int song_get_xiph(lua_State *L)
     StringList::ConstIterator valuesIt = flm[upname].begin();
     for (; valuesIt != flm[upname].end(); valuesIt++) {
         ByteVector vect = (*valuesIt).data(unicode ? String::UTF8 : String::Latin1);
-        /* Make sure the data is NULL terminated */
-        const char *data = vect.data();
-        char *datac = strndup(data, vect.size());
-        if (NULL == datac)
-            return luaL_error(L, "out of memory");
-        datac[vect.size()] = '\0';
         lua_pushinteger(L, tableind++);
-        lua_pushstring(L, datac);
+        lua_pushlstring(L, vect.data(), vect.size());
         lua_settable(L, -3);
-        free(datac);
     }
     return 1;
 }
