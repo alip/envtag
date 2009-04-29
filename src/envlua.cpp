@@ -468,14 +468,14 @@ static int song_set_xiph(lua_State *L)
 
 // Lua registers
 static const luaL_reg song_methods[] = {
+    {"__gc", song_free},
+    {"close", song_free},
     {"save", song_save},
     {"property", song_property},
     {"get", song_get},
     {"set", song_set},
     {"get_xiph", song_get_xiph},
     {"set_xiph", song_set_xiph},
-    {"close", song_free},
-    {"__gc", song_free},
     {NULL, NULL}
 };
 
