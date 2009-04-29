@@ -54,13 +54,13 @@ struct song {
 #define SONG_T "EnvTag.Song"
 #define CHECK_SONG(s)                                   \
     do {                                                \
-        if (!s->f || s->f->isNull()) {                  \
+        if (!(s)->f || (s)->f->isNull()) {              \
             return luaL_argerror(L, 1, "file closed");  \
         }                                               \
     } while (0)
 #define CHECK_TAG(s)                        \
     do {                                    \
-        if (!s->f->tag()) {                 \
+        if (!(s)->f->tag()) {               \
             lua_pushnil(L);                 \
             lua_pushliteral(L, "no tag");   \
             return 2;                       \
@@ -68,13 +68,14 @@ struct song {
     } while (0)
 #define CHECK_PROPERTIES(s)                          \
     do {                                             \
-        if (!s->f->audioProperties()) {              \
+        if (!(s)->f->audioProperties()) {            \
             lua_pushnil(L);                          \
             lua_pushliteral(L, "no audio property"); \
             return 2;                                \
         }                                            \
     } while (0)
 
+// Helper functions
 static void dumpstack(lua_State *L)
 {
     fprintf(stderr, "-------- Lua stack dump ---------\n");
@@ -105,6 +106,39 @@ static void dumpstack(lua_State *L)
     fprintf(stderr, "------- Lua stack dump end ------\n");
 }
 
+static inline bool isxiph(const char *tag)
+{
+    if (0 == strncmp(tag, "title", 6))
+        return true;
+    else if (0 == strncmp(tag, "version", 8))
+        return true;
+    else if (0 == strncmp(tag, "album", 6))
+        return true;
+    else if (0 == strncmp(tag, "artist", 7))
+        return true;
+    else if (0 == strncmp(tag, "performer", 10))
+        return true;
+    else if (0 == strncmp(tag, "copyright", 10))
+        return true;
+    else if (0 == strncmp(tag, "organization", 13))
+        return true;
+    else if (0 == strncmp(tag, "description", 12))
+        return true;
+    else if (0 == strncmp(tag, "genre", 6))
+        return true;
+    else if (0 == strncmp(tag, "date", 5))
+        return true;
+    else if (0 == strncmp(tag, "location", 9))
+        return true;
+    else if (0 == strncmp(tag, "contact", 8))
+        return true;
+    else if (0 == strncmp(tag, "isrc", 5))
+        return true;
+    else
+        return false;
+}
+
+// envtag.Song methods
 static int song_new(lua_State *L)
 {
     const char *path, *type;
@@ -340,38 +374,6 @@ static int song_property(lua_State *L)
     return 1;
 }
 
-static inline bool isxiph(const char *tag)
-{
-    if (0 == strncmp(tag, "title", 6))
-        return true;
-    else if (0 == strncmp(tag, "version", 8))
-        return true;
-    else if (0 == strncmp(tag, "album", 6))
-        return true;
-    else if (0 == strncmp(tag, "artist", 7))
-        return true;
-    else if (0 == strncmp(tag, "performer", 10))
-        return true;
-    else if (0 == strncmp(tag, "copyright", 10))
-        return true;
-    else if (0 == strncmp(tag, "organization", 13))
-        return true;
-    else if (0 == strncmp(tag, "description", 12))
-        return true;
-    else if (0 == strncmp(tag, "genre", 6))
-        return true;
-    else if (0 == strncmp(tag, "date", 5))
-        return true;
-    else if (0 == strncmp(tag, "location", 9))
-        return true;
-    else if (0 == strncmp(tag, "contact", 8))
-        return true;
-    else if (0 == strncmp(tag, "isrc", 5))
-        return true;
-    else
-        return false;
-}
-
 static int song_get_xiph(lua_State *L)
 {
     struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
@@ -465,6 +467,7 @@ static int song_set_xiph(lua_State *L)
     return 0;
 }
 
+// Lua registers
 static const luaL_reg song_methods[] = {
     {"get", song_get},
     {"set", song_set},
@@ -482,6 +485,7 @@ static const luaL_reg envtag_methods[] = {
     {NULL, NULL}
 };
 
+// Command handling
 static inline bool iscommand(const char *name)
 {
     if (0 == strncmp(name, "get", 4))
@@ -603,3 +607,4 @@ int docommand(lua_State *L, int argc, char **argv)
         return ret;
     }
 }
+
