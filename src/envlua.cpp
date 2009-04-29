@@ -255,6 +255,36 @@ static int song_free(lua_State *L)
     return 0;
 }
 
+static int song_save(lua_State *L)
+{
+    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
+    CHECK_SONG(s);
+    lua_pushboolean(L, s->f->save() ? 1 : 0);
+    return 1;
+}
+
+static int song_property(lua_State *L)
+{
+    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
+    const char *name = luaL_checkstring(L, 2);
+
+    CHECK_SONG(s);
+    CHECK_PROPERTIES(s);
+
+    AudioProperties *props = s->f->audioProperties();
+    if (0 == strncmp(name, "length", 7))
+        lua_pushinteger(L, props->length());
+    else if (0 == strncmp(name, "bitrate", 8))
+        lua_pushinteger(L, props->bitrate());
+    else if (0 == strncmp(name, "samplerate", 11))
+        lua_pushinteger(L, props->sampleRate());
+    else if (0 == strncmp(name, "channels", 9))
+        lua_pushinteger(L, props->channels());
+    else
+        return luaL_argerror(L, 2, "invalid audio property");
+    return 1;
+}
+
 static int song_get(lua_State *L)
 {
     struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
@@ -341,37 +371,6 @@ static int song_set(lua_State *L)
     else
         return luaL_argerror(L, 2, "invalid tag");
     return 0;
-}
-
-static int song_save(lua_State *L)
-{
-    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
-    CHECK_SONG(s);
-
-    lua_pushboolean(L, s->f->save() ? 1 : 0);
-    return 1;
-}
-
-static int song_property(lua_State *L)
-{
-    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
-    const char *name = luaL_checkstring(L, 2);
-
-    CHECK_SONG(s);
-    CHECK_PROPERTIES(s);
-
-    AudioProperties *props = s->f->audioProperties();
-    if (0 == strncmp(name, "length", 7))
-        lua_pushinteger(L, props->length());
-    else if (0 == strncmp(name, "bitrate", 8))
-        lua_pushinteger(L, props->bitrate());
-    else if (0 == strncmp(name, "samplerate", 11))
-        lua_pushinteger(L, props->sampleRate());
-    else if (0 == strncmp(name, "channels", 9))
-        lua_pushinteger(L, props->channels());
-    else
-        return luaL_argerror(L, 2, "invalid audio property");
-    return 1;
 }
 
 static int song_get_xiph(lua_State *L)
@@ -469,10 +468,10 @@ static int song_set_xiph(lua_State *L)
 
 // Lua registers
 static const luaL_reg song_methods[] = {
-    {"get", song_get},
-    {"set", song_set},
     {"save", song_save},
     {"property", song_property},
+    {"get", song_get},
+    {"set", song_set},
     {"get_xiph", song_get_xiph},
     {"set_xiph", song_set_xiph},
     {"close", song_free},
