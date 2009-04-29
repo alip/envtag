@@ -46,12 +46,34 @@
 
 using namespace TagLib;
 
-#define SONG_T "EnvTag.Song"
-
 struct song {
     char *path;
     FileRef *f;
 };
+
+#define SONG_T "EnvTag.Song"
+#define CHECK_SONG(s)                                   \
+    do {                                                \
+        if (!s->f || s->f->isNull()) {                  \
+            return luaL_argerror(L, 1, "file closed");  \
+        }                                               \
+    } while (0)
+#define CHECK_TAG(s)                        \
+    do {                                    \
+        if (!s->f->tag()) {                 \
+            lua_pushnil(L);                 \
+            lua_pushliteral(L, "no tag");   \
+            return 2;                       \
+        }                                   \
+    } while (0)
+#define CHECK_PROPERTIES(s)                          \
+    do {                                             \
+        if (!s->f->audioProperties()) {              \
+            lua_pushnil(L);                          \
+            lua_pushliteral(L, "no audio property"); \
+            return 2;                                \
+        }                                            \
+    } while (0)
 
 static void dumpstack(lua_State *L)
 {
@@ -205,13 +227,8 @@ static int song_get(lua_State *L)
     const char *name = luaL_checkstring(L, 2);
     bool unicode = lua_toboolean(L, 3);
 
-    if (!s->f || s->f->isNull())
-        return luaL_argerror(L, 1, "file closed");
-    else if (!s->f->tag()) {
-        lua_pushnil(L);
-        lua_pushstring(L, "no tag");
-        return 2;
-    }
+    CHECK_SONG(s);
+    CHECK_TAG(s);
 
     Tag *tag = s->f->tag();
     if (0 == strncmp(name, "title", 6)) {
@@ -269,13 +286,8 @@ static int song_set(lua_State *L)
             tval = String(cval, unicode ? String::UTF8 : String::Latin1);
     }
 
-    if (!s->f || s->f->isNull())
-        return luaL_argerror(L, 1, "file closed");
-    else if (!s->f->tag()) {
-        lua_pushnil(L);
-        lua_pushstring(L, "no tag");
-        return 2;
-    }
+    CHECK_SONG(s);
+    CHECK_TAG(s);
 
     Tag *tag = s->f->tag();
     if (0 == strncmp(name, "title", 6))
@@ -300,8 +312,8 @@ static int song_set(lua_State *L)
 static int song_save(lua_State *L)
 {
     struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
-    if (!s->f || s->f->isNull())
-        return luaL_argerror(L, 1, "file closed");
+    CHECK_SONG(s);
+
     lua_pushboolean(L, s->f->save() ? 1 : 0);
     return 1;
 }
@@ -311,13 +323,8 @@ static int song_property(lua_State *L)
     struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
     const char *name = luaL_checkstring(L, 2);
 
-    if (!s->f || s->f->isNull())
-        return luaL_argerror(L, 1, "file closed");
-    if (!s->f->audioProperties()) {
-        lua_pushnil(L);
-        lua_pushstring(L, "no audio property");
-        return 2;
-    }
+    CHECK_SONG(s);
+    CHECK_PROPERTIES(s);
 
     AudioProperties *props = s->f->audioProperties();
     if (0 == strncmp(name, "length", 7))
@@ -373,14 +380,8 @@ static int song_get_xiph(lua_State *L)
 
     if (!isxiph(name))
         return luaL_argerror(L, 2, "invalid tag");
-
-    if (!s->f || s->f->isNull())
-        return luaL_argerror(L, 1, "file closed");
-    else if (!s->f->tag()) {
-        lua_pushnil(L);
-        lua_pushstring(L, "no tag");
-        return 2;
-    }
+    CHECK_SONG(s);
+    CHECK_TAG(s);
 
     File *file = s->f->file();
     Ogg::XiphComment *xtag;
@@ -432,14 +433,8 @@ static int song_set_xiph(lua_State *L)
         return luaL_argerror(L, 2, "invalid tag");
     if (!lua_istable(L, 3))
         return luaL_argerror(L, 3, "not a table");
-
-    if (!s->f || s->f->isNull())
-        return luaL_argerror(L, 1, "file closed");
-    else if (!s->f->tag()) {
-        lua_pushnil(L);
-        lua_pushstring(L, "no tag");
-        return 2;
-    }
+    CHECK_SONG(s);
+    CHECK_TAG(s);
 
     File *file = s->f->file();
     Ogg::XiphComment *xtag;
