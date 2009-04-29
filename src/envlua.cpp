@@ -373,6 +373,23 @@ static int song_set(lua_State *L)
     return 0;
 }
 
+static int song_has_xiph(lua_State *L)
+{
+    struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
+    CHECK_SONG(s);
+
+    File *file = s->f->file();
+    if (dynamic_cast<Ogg::File *>(file))
+        lua_pushboolean(L, 1);
+    else if (dynamic_cast<FLAC::File *>(file)) {
+        FLAC::File *ff = dynamic_cast<FLAC::File *>(file);
+        lua_pushboolean(L, ff->xiphComment() ? 1 : 0);
+    }
+    else
+        lua_pushboolean(L, 0);
+    return 1;
+}
+
 static int song_get_xiph(lua_State *L)
 {
     struct song *s = (struct song *) luaL_checkudata(L, 1, SONG_T);
@@ -474,6 +491,7 @@ static const luaL_reg song_methods[] = {
     {"property", song_property},
     {"get", song_get},
     {"set", song_set},
+    {"has_xiph", song_has_xiph},
     {"get_xiph", song_get_xiph},
     {"set_xiph", song_set_xiph},
     {NULL, NULL}

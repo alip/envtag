@@ -85,6 +85,9 @@ for i=optind,#arg do
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
         RETVAL = 1
+    elseif not song:has_xiph() then
+        log("file `%s' has no xiph comments", arg[i])
+        RETVAL = 1
     else
         for _, tag in ipairs(envutils.TAGS_XIPH) do
             t, msg = song:get_xiph(tag, unicode)
