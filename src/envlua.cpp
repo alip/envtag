@@ -105,117 +105,82 @@ static int song_new(lua_State *L)
         return 2;
     }
 
+#define INVALID_TYPE(errmsg)        \
+    do {                            \
+        lua_pop(L, 1);              \
+        lua_pushnil(L);             \
+        lua_pushliteral(L, errmsg); \
+        return 2;                   \
+    } while (0)
+
     s->f = 0;
     if (NULL == type) {
         s->f = new FileRef(path, readprops);
-        if (!s->f || s->f->isNull()) {
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "unknown file type");
-            return 2;
-        }
+        if (!s->f || s->f->isNull())
+            INVALID_TYPE("unknown file type");
     }
     else if (0 == strncmp(type, "flac", 5)) {
         FLAC::File *nf = new FLAC::File(path, readprops);
         if (nf && nf->isValid())
             s->f = new FileRef(nf);
-        else {
-            delete nf;
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid flac");
-            return 2;
-        }
+        else
+            INVALID_TYPE("invalid flac");
     }
     else if (0 == strncmp(type, "mpc", 4)) {
         MPC::File *nf = new MPC::File(path, readprops);
         if (nf && nf->isValid())
             s->f = new FileRef(nf);
-        else {
-            delete nf;
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid mpc");
-            return 2;
-        }
+        else
+            INVALID_TYPE("invalid mpc");
     }
     else if (0 == strncmp(type, "mpeg", 5)) {
         MPEG::File *nf = new MPEG::File(path, readprops);
         if (nf && nf->isValid())
             s->f = new FileRef(nf);
-        else {
-            delete nf;
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid mpeg");
-            return 2;
-        }
+        else
+            INVALID_TYPE("invalid mpeg");
     }
     else if (0 == strncmp(type, "oggflac", 8)) {
         Ogg::FLAC::File *nf = new Ogg::FLAC::File(path, readprops);
         if (nf && nf->isValid())
             s->f = new FileRef(nf);
-        else {
-            delete nf;
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid oggflac");
-            return 2;
-        }
+        else
+            INVALID_TYPE("invalid oggflac");
     }
     else if (0 == strncmp(type, "speex", 6)) {
         Ogg::Speex::File *nf = new Ogg::Speex::File(path, readprops);
         if (nf && nf->isValid())
             s->f = new FileRef(nf);
-        else {
-            delete nf;
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid speex");
-            return 2;
-        }
+        else
+            INVALID_TYPE("invalid speex");
     }
     else if (0 == strncmp(type, "vorbis", 7)) {
         Ogg::Vorbis::File *nf = new Ogg::Vorbis::File(path, readprops);
         if (nf && nf->isValid())
             s->f = new FileRef(nf);
-        else {
-            delete nf;
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid vorbis");
-            return 2;
-        }
+        else
+            INVALID_TYPE("invalid vorbis");
     }
     else if (0 == strncmp(type, "wavpack", 8)) {
         WavPack::File *nf = new WavPack::File(path, readprops);
         if (nf && nf->isValid())
             s->f = new FileRef(nf);
-        else {
-            delete nf;
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid wavpack");
-            return 2;
-        }
+        else
+            INVALID_TYPE("ınvalid wavpack");
     }
     else if (0 == strncmp(type, "trueaudio", 10)) {
         TrueAudio::File *nf = new TrueAudio::File(path, readprops);
         if (nf && nf->isValid())
             s->f = new FileRef(nf);
-        else {
-            delete nf;
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid trueaudio");
-            return 2;
-        }
+        else
+            INVALID_TYPE("invalid trueaudio");
     }
     else {
         lua_pop(L, 1);
         return luaL_argerror(L, 2, "bad type");
     }
     return 1;
+#undef INVALID_TYPE
 }
 
 static int song_free(lua_State *L)
