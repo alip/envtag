@@ -31,9 +31,11 @@
 
 #include "envmime.hh"
 
-TagLib::File *MagicFileTypeResolver::createFile(TagLib::FileName fileName,
+using namespace TagLib;
+
+File *MagicFileTypeResolver::createFile(FileName fileName,
         bool readProperties,
-        TagLib::AudioProperties::ReadStyle propertiesStyle) const
+        AudioProperties::ReadStyle propertiesStyle) const
 {
     const char *desc;
     static magic_t db = NULL;
@@ -54,42 +56,42 @@ TagLib::File *MagicFileTypeResolver::createFile(TagLib::FileName fileName,
         return 0;
 
     if (0 == strncmp(desc, "MPEG ADTS", 9)) {
-        TagLib::MPEG::File *f = new TagLib::MPEG::File(fileName, readProperties, propertiesStyle);
+        MPEG::File *f = new MPEG::File(fileName, readProperties, propertiesStyle);
         if (f->isValid())
             return f;
         else
             delete f;
     }
     else if (0 == strncmp(desc, "Ogg data, FLAC audio", 20)) {
-        TagLib::Ogg::FLAC::File *f = new TagLib::Ogg::FLAC::File(fileName, readProperties, propertiesStyle);
+        Ogg::FLAC::File *f = new Ogg::FLAC::File(fileName, readProperties, propertiesStyle);
         if (f->isValid())
             return f;
         else
             delete f;
     }
     else if (0 == strncmp(desc, "Ogg data, Speex audio", 21)) {
-        TagLib::Ogg::Speex::File *f = new TagLib::Ogg::Speex::File(fileName, readProperties, propertiesStyle);
+        Ogg::Speex::File *f = new Ogg::Speex::File(fileName, readProperties, propertiesStyle);
         if (f->isValid())
             return f;
         else
             delete f;
     }
     else if (0 == strncmp(desc, "Ogg data, Vorbis audio", 22)) {
-        TagLib::Ogg::Vorbis::File *f = new TagLib::Ogg::Vorbis::File(fileName, readProperties, propertiesStyle);
+        Ogg::Vorbis::File *f = new Ogg::Vorbis::File(fileName, readProperties, propertiesStyle);
         if (f->isValid())
             return f;
         else
             delete f;
     }
     else if (0 == strncmp(desc, "FLAC audio", 10)) {
-        TagLib::FLAC::File *f = new TagLib::FLAC::File(fileName, readProperties, propertiesStyle);
+        FLAC::File *f = new FLAC::File(fileName, readProperties, propertiesStyle);
         if (f->isValid())
             return f;
         else
             delete f;
     }
     else if (0 == strncmp(desc, "Musepack audio", 14)) {
-        TagLib::MPC::File *f = new TagLib::MPC::File(fileName, readProperties, propertiesStyle);
+        MPC::File *f = new MPC::File(fileName, readProperties, propertiesStyle);
         if (f->isValid())
             return f;
         else
@@ -98,7 +100,7 @@ TagLib::File *MagicFileTypeResolver::createFile(TagLib::FileName fileName,
 #if 0
     // Not supported by libmagic yet...
     else if (0 == strncmp(desc, "Wavpack audio", 13)) {
-        TagLib::WavPack::File *f = new TagLib::WavPack::File(fileName, readProperties, propertiesStyle);
+        WavPack::File *f = new WavPack::File(fileName, readProperties, propertiesStyle);
         if (f->isValid())
             return f;
         else
