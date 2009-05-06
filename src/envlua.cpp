@@ -619,7 +619,7 @@ int docommand(lua_State *L, int argc, char **argv)
     }
     else {
         lua_getglobal(L, "RETVAL");
-        ret = lua_isnoneornil(L, -1) ? 0 : luaL_checkinteger(L, -1);
+        ret = lua_isnoneornil(L, -1) ? EXIT_SUCCESS : luaL_checkinteger(L, -1);
         lua_pop(L, 1);
         return ret;
     }
