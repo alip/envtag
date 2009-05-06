@@ -19,6 +19,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <sysexits.h>
 #include <sys/types.h>
 #include <pwd.h>
 #include <unistd.h>
@@ -550,6 +551,15 @@ lua_State *init_lua(void)
 
     // Register envtag module
     luaL_register(L, "envtag", envtag_methods);
+    // Set common exit codes
+    lua_pushinteger(L, EX_USAGE);
+    lua_setfield(L, 1, "EX_USAGE");
+    lua_pushinteger(L, EX_DATAERR);
+    lua_setfield(L, 1, "EX_DATAERR");
+    lua_pushinteger(L, EX_NOINPUT);
+    lua_setfield(L, 1, "EX_NOINPUT");
+    lua_pushinteger(L, EX_IOERR);
+    lua_setfield(L, "EX_IOERR");
     // Set default envtag.exit_code
     lua_pushinteger(L, EXIT_SUCCESS);
     lua_setfield(L, 1, EXIT_CODE);

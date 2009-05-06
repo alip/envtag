@@ -50,7 +50,7 @@ for index, opt in ipairs(opts) do
             autype = optarg[index]
         else
             log("-t option requires an argument")
-            envtag.exit_code = 1
+            envtag.exit_code = envtag.EX_USAGE
             return
         end
     elseif "n" == opt then
@@ -62,12 +62,12 @@ for index, opt in ipairs(opts) do
             delim = optarg[index]
             if 1 ~= delim then
                 log"delimiter must be a single character"
-                envtag.exit_code = 1
+                envtag.exit_code = envtag.EX_USAGE
                 return
             end
         else
             log"-d option requires an argument"
-            envtag.exit_code = 1
+            envtag.exit_code = envtag.EX_USAGE
             return
         end
     end
@@ -75,7 +75,7 @@ end
 
 if optind > #arg then
     log"no file given"
-    envtag.exit_code = 1
+    envtag.exit_code = envtag.EX_NOINPUT
     return
 end
 
@@ -84,16 +84,16 @@ for i=optind,#arg do
     song, msg = envtag.Song(arg[i], autype, false)
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
-        envtag.exit_code = 1
+        envtag.exit_code = envtag.EX_DATAERR
     elseif not song:has_xiph() then
         log("file `%s' has no xiph comments", arg[i])
-        envtag.exit_code = 1
+        envtag.exit_code = envtag.EX_DATAERR
     else
         for _, tag in ipairs(envutils.TAGS_XIPH) do
             t, msg = song:get_xiph(tag, unicode)
             if not t then
                 log("failed to get xiph comment `%s' from file `%s': %s", tag, arg[i], msg)
-                envtag.exit_code = 1
+                envtag.exit_code = envtag.EX_DATAERR
             elseif 0 ~= t then
                 print(string.format("%s%s='%s'", export and "export " or "", string.upper(tag),
                     escapeq(table.concat(t, delim))))

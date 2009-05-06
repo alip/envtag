@@ -47,7 +47,7 @@ for index, opt in ipairs(opts) do
             autype = optarg[index]
         else
             log"-t option requires an argument"
-            envtag.exit_code = 1
+            envtag.exit_code = envtag.EX_USAGE
             return
         end
     elseif "n" == opt then
@@ -59,7 +59,7 @@ end
 
 if optind > #arg then
     log"no file given"
-    envtag.exit_code = 1
+    envtag.exit_code = envtag.EX_NOINPUT
     return
 end
 
@@ -68,7 +68,7 @@ for i=optind,#arg do
     song, msg = envtag.Song(arg[i], autype, false)
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
-        envtag.exit_code = 1
+        envtag.exit_code = envtag.EX_DATAERR
     else
         for _, tag in ipairs(envutils.TAGS_COMMON) do
             t, msg = song:get(tag, unicode)

@@ -66,7 +66,7 @@ for index, opt in ipairs(opts) do
             autype = optarg[index]
         else
             log"-t option requires an argument"
-            envtag.exit_code = 1
+            envtag.exit_code = envtag.EX_USAGE
             return
         end
     elseif "n" == opt then
@@ -78,7 +78,7 @@ for index, opt in ipairs(opts) do
             topcount = assert(tonumber(optarg[index]), "count not a number")
         else
             log"-T option requires an argument"
-            envtag.exit_code = 1
+            envtag.exit_code = envtag.EX_USAGE
             return
         end
     end
@@ -86,7 +86,7 @@ end
 
 if optind > #arg then
     log"no file given"
-    envtag.exit_code = 1
+    envtag.exit_code = envtag.EX_NOINPUT
     return
 end
 
@@ -104,12 +104,12 @@ for i=optind,#arg do
     local song, msg = envtag.Song(arg[i], autype, readprops)
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
-        envtag.exit_code = 1
+        envtag.exit_code = envtag.EX_DATAERR
     else
         local album, msg = song:get("album", unicode)
         if not album then
             log("failed to get album from `%s': %s", arg[i], msg)
-            envtag.exit_code = 1
+            envtag.exit_code = envtag.EX_DATAERR
         elseif album ~= 0 then
             if album_list[album] then
                 album_list[album] = album_list[album] + 1
@@ -122,7 +122,7 @@ for i=optind,#arg do
         local artist, msg = song:get("artist", unicode)
         if not artist then
             log("failed to get artist from `%s': %s", arg[i], msg)
-            envtag.exit_code = 1
+            envtag.exit_code = envtag.EX_DATAERR
         elseif artist ~= 0 then
             if artist_list[artist] then
                 artist_list[artist] = artist_list[artist] + 1
@@ -135,7 +135,7 @@ for i=optind,#arg do
         local genre, msg = song:get("genre", unicode)
         if not genre then
             log("failed to get genre from `%s': %s", arg[i], msg)
-            envtag.exit_code = 1
+            envtag.exit_code = envtag.EX_DATAERR
         elseif genre ~= 0 then
             if genre_list[genre] then
                 genre_list[genre] = genre_list[genre] + 1
