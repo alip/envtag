@@ -626,14 +626,14 @@ int docommand(lua_State *L, int argc, char **argv)
         path = userpath(argv[0]);
         if (0 == path.compare("")) {
             std::cerr << PACKAGE": getpwuid() failed: " << strerror(errno) << std::endl;
-            return EXIT_FAILURE;
+            return EX_OSERR;
         }
     }
     ret = luaL_dofile(L, path.c_str());
     if (0 != ret) {
         std::cerr << PACKAGE": " << lua_tostring(L, -1) << std::endl;
         lua_pop(L, 1);
-        return EXIT_FAILURE;
+        return EX_SOFTWARE;
     }
     else {
         // Get the exit code from envtag.exit_code
