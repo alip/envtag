@@ -53,6 +53,7 @@ struct song {
 };
 
 #define SONG_T "EnvTag.Song"
+#define EXIT_CODE "exit_code"
 #define CHECK_SONG(s)                                   \
     do {                                                \
         if (!(s)->f || (s)->f->isNull()) {              \
@@ -547,10 +548,15 @@ lua_State *init_lua(void)
     lua_State *L = lua_open();
     luaL_openlibs(L);
 
+    // Register envtag module
     luaL_register(L, "envtag", envtag_methods);
+    // Set default envtag.exit_code
+    lua_pushinteger(L, EXIT_SUCCESS);
+    lua_setfield(L, 1, EXIT_CODE);
+    // Register envtag.Song()
     luaL_newmetatable(L, SONG_T);
     luaL_register(L, NULL, song_methods);
-    lua_pushstring(L, "__index");
+    lua_pushliteral(L, "__index");
     lua_pushvalue(L, -2); // push the metatable
     lua_settable(L, -3); // metatable.__index = metatable
     lua_pop(L, 2); // clean the stack
@@ -620,8 +626,12 @@ int docommand(lua_State *L, int argc, char **argv)
         return EXIT_FAILURE;
     }
     else {
-        lua_getglobal(L, "RETVAL");
-        ret = lua_isnoneornil(L, -1) ? EXIT_SUCCESS : luaL_checkinteger(L, -1);
+        // Get the exit code from envtag.exit_code
+        lua_getglobal(L, "envtag");
+        assert(LUA_TTABLE == lua_type(L, 1));
+        lua_getfield(L, 1, EXIT_CODE);
+        assert(LUA_TNUMBER == lua_type(L, 2));
+        ret = lua_tointeger(L, 2);
         lua_pop(L, 1);
         return ret;
     }

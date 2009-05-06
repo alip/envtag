@@ -53,7 +53,7 @@ for index, opt in ipairs(opts) do
             autype = optarg[index]
         else
             log"-t option requires an argument"
-            RETVAL = 1
+            envtag.exit_code = 1
             return
         end
     elseif "a" == opt then
@@ -63,12 +63,12 @@ for index, opt in ipairs(opts) do
             delim = optarg[index]
             if 1 ~= delim then
                 log"delimiter must be a single character"
-                RETVAL = 1
+                envtag.exit_code = 1
                 return
             end
         else
             log"-d option requires an argument"
-            RETVAL = 1
+            envtag.exit_code = 1
             return
         end
     elseif "n" == opt then
@@ -78,7 +78,7 @@ end
 
 if optind > #arg then
     log"no file given"
-    RETVAL = 1
+    envtag.exit_code = 1
     return
 end
 
@@ -92,7 +92,7 @@ for i=optind,#arg do
     song, msg = envtag.Song(arg[i], autype, false)
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
-        RETVAL=1
+        envtag.exit_code = 1
     else
         for _, tag in ipairs(envutils.TAGS_XIPH) do
             local t = os.getenv(string.upper(tag))
@@ -102,7 +102,7 @@ for i=optind,#arg do
         end
         if not song:save() then
             log("failed to save `%s'", arg[i])
-            RETVAL = 1
+            envtag.exit_code = 1
         end
         song:close()
     end

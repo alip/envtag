@@ -54,7 +54,7 @@ end
 
 if optind > #arg then
     log"no file given"
-    RETVAL=1
+    envtag.exit_code = 1
     return
 end
 
@@ -71,7 +71,7 @@ for i=optind,#arg do
     song, msg = envtag.Song(arg[i], autype, false)
     if not song then
         log("failed to open `%s': %s", arg[i], msg)
-        RETVAL=1
+        envtag.exit_code = 1
     else
         for _, tag in ipairs(envutils.TAGS_COMMON) do
             if taglist[tag] then
@@ -80,7 +80,7 @@ for i=optind,#arg do
         end
         if not song:save() then
             log("failed to save `%s'", arg[i])
-            RETVAL=1
+            envtag.exit_code = 1
         end
         song:close()
     end
