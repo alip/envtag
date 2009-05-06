@@ -12,7 +12,7 @@ Here are some examples of simple usage. For advanced usage, have a look at
 [examples/](http://github.com/alip/envtag/tree/master/examples) directory under source tree.
 
     # Reading tag information
-    eval $(envtag /path/to/audio/file)
+    eval $(envtag get /path/to/audio/file)
     echo "Title: $TITLE"
     echo "Artist: $ARTIST"
     echo "Album: $ALBUM"
@@ -22,12 +22,12 @@ Here are some examples of simple usage. For advanced usage, have a look at
     echo "Track: $TRACK"
 
     # Saving tag information
-    COMMENT="Tagged by envtag" envtag -s *.mp3
+    COMMENT="Tagged by envtag" envtag set *.mp3
 
     # Changing file format preserving tag information
-    eval $(envtag -E /path/to/audio/file) # exports tag information
+    eval $(envtag get -E /path/to/audio/file) # exports tag information
     decoder -o - /path/to/audio/file | encoder - -o /path/to/audio/file.new
-    envtag -s /path/to/audio/file.new # grabs exported tag information and saves it
+    envtag set /path/to/audio/file.new # grabs exported tag information and saves it
 
 ## Contributing
 
