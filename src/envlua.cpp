@@ -17,6 +17,7 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -554,14 +555,17 @@ lua_State *init_lua(void)
     lua_pushstring(L, "__index");
     lua_pushvalue(L, -2); // push the metatable
     lua_settable(L, -3); // metatable.__index = metatable
+    lua_pop(L, 2); // clean the stack
 
     // Add LIBEXECDIR/PACKAGE/modules/?.lua to package.path
-    if (0 != luaL_dostring(L, "package.path = '"LIBEXECDIR"/"PACKAGE"/modules/?.lua;' .. package.path"))
-    {
-        std::cerr << PACKAGE": error adding envtag module directory to package.path: " \
-            << lua_tostring(L, -1) << std::endl;
-        lua_pop(L, 1);
-    }
+    lua_getglobal(L, "package");
+    assert(LUA_TTABLE == lua_type(L, 1));
+    lua_pushliteral(L, LIBEXECDIR"/"PACKAGE"/modules/?.lua;");
+    lua_getfield(L, 1, "path");
+    assert(LUA_TSTRING == lua_type(L, 3));
+    lua_concat(L, 2);
+    lua_setfield(L, 1, "path");
+    lua_pop(L, 1);
 
     // Initialize using ENV_INIT
     char *init = getenv(ENV_INIT);
