@@ -559,7 +559,7 @@ lua_State *init_lua(void)
     lua_pushinteger(L, EX_NOINPUT);
     lua_setfield(L, 1, "EX_NOINPUT");
     lua_pushinteger(L, EX_IOERR);
-    lua_setfield(L, "EX_IOERR");
+    lua_setfield(L, 1, "EX_IOERR");
     // Set default envtag.exit_code
     lua_pushinteger(L, EXIT_SUCCESS);
     lua_setfield(L, 1, EXIT_CODE);
