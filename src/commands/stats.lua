@@ -146,7 +146,7 @@ for i=optind,#arg do
             end
         end
 
-        length = length + (song:property("length") or 0)
+        length = length + (song:property"length" or 0)
 
         song:close()
     end
