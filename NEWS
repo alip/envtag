@@ -4,6 +4,11 @@ News for envtag
 This file lists the major changes between versions. For a more detailed list of
 every change, see git log.
 
+0.4:
+    * Modular architecture, exporting tag functions to Lua.
+    * Proper exit codes
+    * Update alt_getopt to 0.6
+
 0.3:
     * Rewritten in C++ to make better use of taglib
     * Lua is a hard dependency now, envtag uses it extensively
