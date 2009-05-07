@@ -25,7 +25,7 @@ Here are some examples of simple usage. For advanced usage, have a look at
     COMMENT="Tagged by envtag" envtag set *.mp3
 
     # Changing file format preserving tag information
-    eval $(envtag get -E /path/to/audio/file) # exports tag information
+    eval $(envtag get --export /path/to/audio/file) # exports tag information
     decoder -o - /path/to/audio/file | encoder - -o /path/to/audio/file.new
     envtag set /path/to/audio/file.new # grabs exported tag information and saves it
 
