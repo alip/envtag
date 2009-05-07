@@ -50,20 +50,6 @@ function split(src, char)
     return list
 end
 
-local SECSPERDAY = 86400
-local SECSPERHOUR = 3600
-local SECSPERMIN = 60
-function pretty_time(t)
-    days = t / SECSPERDAY
-    t = t % SECSPERDAY
-    hours = t / SECSPERHOUR
-    t = t % SECSPERHOUR
-    mins = t / SECSPERMIN
-    t = t % SECSPERMIN
-    secs = t
-    return string.format("%d days, %d:%02d:%02d", days, hours, mins, secs)
-end
-
 TAGS_COMMON = {
     "title", "artist", "album", "comment",
     "genre", "year", "track"

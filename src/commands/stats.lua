@@ -27,6 +27,20 @@ local function top(list, count)
     return best
 end
 
+local SECSPERDAY = 86400
+local SECSPERHOUR = 3600
+local SECSPERMIN = 60
+local function pretty_time(t)
+    days = t / SECSPERDAY
+    t = t % SECSPERDAY
+    hours = t / SECSPERHOUR
+    t = t % SECSPERHOUR
+    mins = t / SECSPERMIN
+    t = t % SECSPERMIN
+    secs = t
+    return string.format("%d days, %d:%02d:%02d", days, hours, mins, secs)
+end
+
 local function usage()
     print"envtag stats -- Show statistics"
     print"Usage: envtag stats [-hvn] [-t TYPE] file..."
