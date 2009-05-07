@@ -97,7 +97,7 @@ local genre_list = {}
 local nalbum = 0
 local nartist = 0
 local ngenre = 0
-local nsong = #arg - optind + 1
+local nsong = 0
 
 for i=optind,#arg do
     logv("processing %d of %d: `%s'", i - optind + 1, #arg - optind + 1, arg[i])
@@ -106,6 +106,7 @@ for i=optind,#arg do
         log("failed to open `%s': %s", arg[i], msg)
         envtag.exit_code = envtag.EX_DATAERR
     else
+        nsong = nsong + 1
         local album, msg = song:get("album", unicode)
         if not album then
             log("failed to get album from `%s': %s", arg[i], msg)
