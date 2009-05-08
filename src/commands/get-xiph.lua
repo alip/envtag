@@ -49,7 +49,7 @@ for index, opt in ipairs(opts) do
         if optarg[index] then
             autype = optarg[index]
         else
-            log("-t option requires an argument")
+            log"-t option requires an argument"
             envtag.exit_code = envtag.EX_USAGE
             return
         end
