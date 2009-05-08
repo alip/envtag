@@ -171,7 +171,7 @@ print("Artists: " .. nartist)
 print("Genres: " .. ngenre)
 print("Songs: " .. nsong)
 if readprops then
-    print("Total play time: " .. envutils.pretty_time(length))
+    print("Total play time: " .. pretty_time(length))
 end
 
 top_artists = top(artist_list, topcount)
