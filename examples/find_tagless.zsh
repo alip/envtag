@@ -20,7 +20,7 @@ autoload -U zargs
 function tfilter() {
     for file in "$@"; do
         unset ARTIST TITLE ALBUM GENRE
-        eval `envtag get "$file"`
+        eval $(envtag get "$file")
         if [[ 0 != $? ]]; then
             echo "FAIL $file"
             continue

@@ -33,6 +33,6 @@ if [[ -z "${oggenc}" ]]; then
 fi
 
 echo "${fflac} -> ${fogg}" >&2
-eval `envtag get --export --verbose "${fflac}"`
+eval $(envtag get --export --verbose "${fflac}")
 "${flac}" --decode --stdout "${fflac}" - | "${oggenc}" "${oggenc_opts}" -o "${fogg}" -
 envtag set --verbose "${fogg}"
