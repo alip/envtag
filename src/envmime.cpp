@@ -41,7 +41,7 @@ File *MagicFileTypeResolver::createFile(FileName fileName,
     static magic_t db = NULL;
 
     if (NULL == db) {
-        db = magic_open(MAGIC_NONE);
+        db = magic_open(MAGIC_SYMLINK);
         if (NULL == db)
             return 0;
         if (0 > magic_load(db, NULL)) {

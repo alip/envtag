@@ -4,6 +4,7 @@ News for envtag
 This file lists the major changes between versions. For a more detailed list of
 every change, see git log.
 
+    * Follow symlinks when determining filetype information using libmagic
 0.4:
     * Modular architecture, exporting tag functions to Lua.
     * Proper exit codes
