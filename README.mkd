@@ -38,5 +38,5 @@ Contributions to envtag are welcome:
 
 ## Authors
 
- * Ali Polatel &lt;[polatel@gmail.com](mailto:polatel@gmail.com)&gt;
+ * Ali Polatel &lt;[alip@exherbo.org](mailto:alip@exherbo.org)&gt;
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 -- envtag utility functions
 -- vim: set ft=lua et sts=4 sw=4 ts=4 fdm=marker:
--- Copyright 2009 Ali Polatel <polatel@gmail.com>
+-- Copyright 2009 Ali Polatel <alip@exherbo.org>
 -- Distributed under the terms of the GNU General Public License v2
 
 local unpack = unpack
@@ -60,4 +60,3 @@ TAGS_XIPH = {
     "genre", "date", "location", "contact", "isrc"
 }
 PROPERTIES = {"length", "bitrate", "samplerate", "channels"}
-
