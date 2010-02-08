@@ -1,6 +1,6 @@
 SUBDIRS= commands modules .
-AM_CXXFLAGS= $(taglib_CFLAGS) $(lua_CFLAGS) @ENVTAG_CXXFLAGS@ \
-	     -DLIBEXECDIR=\"$(libexecdir)\" -DGITHEAD=\"$(GITHEAD)\"
+DEFS+= -DLIBEXECDIR=\"$(libexecdir)\" -DGITHEAD=\"$(GIT_HEAD)\"
+AM_CXXFLAGS= $(taglib_CFLAGS) $(lua_CFLAGS) @ENVTAG_CXXFLAGS@
 
 bin_PROGRAMS= envtag
 envtag_SOURCES= envlua.hh envlua.cpp envmain.cpp

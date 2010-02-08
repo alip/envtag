@@ -1,7 +1,7 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
 
 /*
- * Copyright (c) 2009 Ali Polatel <alip@exherbo.org>
+ * Copyright (c) 2009, 2010 Ali Polatel <alip@exherbo.org>
  *
  * This file is part of the envtag audio tagger. envtag is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -35,12 +35,7 @@
 using namespace std;
 
 void about(void) {
-    cerr << PACKAGE"-"VERSION;
-#if defined(GITHEAD)
-    if (0 != strlen(GITHEAD))
-        cerr << "-"GITHEAD;
-#endif
-    cerr << endl;
+    cerr << PACKAGE"-"VERSION GITHEAD << endl;
 }
 
 void usage(void) {
