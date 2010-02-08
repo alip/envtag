@@ -61,7 +61,7 @@ for index, opt in ipairs(opts) do
     elseif "d" == opt then
         if optarg[index] then
             delim = optarg[index]
-            if 1 ~= delim then
+            if 1 ~= #delim then
                 log"delimiter must be a single character"
                 envtag.exit_code = envtag.EX_USAGE
                 return

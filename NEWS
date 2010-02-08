@@ -4,6 +4,7 @@ News for envtag
 This file lists the major changes between versions. For a more detailed list of
 every change, see git log.
 
+    * Fix --delimiter option of get-xiph and set-xiph commands
     * Update alt_getopt to 0.7
     * Follow symlinks when determining filetype information using libmagic
 0.4:
