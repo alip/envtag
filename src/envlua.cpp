@@ -485,7 +485,7 @@ static int song_set_xiph(lua_State *L)
 }
 
 // Lua registers
-static const luaL_reg song_methods[] = {
+static const luaL_Reg song_methods[] = {
     {"__gc", song_free},
     {"close", song_free},
     {"save", song_save},
@@ -498,7 +498,7 @@ static const luaL_reg song_methods[] = {
     {NULL, NULL}
 };
 
-static const luaL_reg envtag_methods[] = {
+static const luaL_Reg envtag_methods[] = {
     {"Song", song_new},
     {NULL, NULL}
 };
@@ -546,11 +546,23 @@ static std::string userpath(const char *name)
 
 lua_State *init_lua(void)
 {
+#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 502
     lua_State *L = lua_open();
+#else
+    lua_State *L = luaL_newstate();
+#endif
     luaL_openlibs(L);
 
     // Register envtag module
+#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 502
     luaL_register(L, "envtag", envtag_methods);
+#else
+    lua_newtable(L);
+    luaL_setfuncs(L, envtag_methods, 0);
+    lua_pushvalue(L, -1);
+    lua_setglobal(L, "envtag");
+#endif
+
     // Set common exit codes
     lua_pushinteger(L, EX_USAGE);
     lua_setfield(L, 1, "EX_USAGE");
@@ -565,7 +577,11 @@ lua_State *init_lua(void)
     lua_setfield(L, 1, EXIT_CODE);
     // Register envtag.Song()
     luaL_newmetatable(L, SONG_T);
+#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 502
     luaL_register(L, NULL, song_methods);
+#else
+    luaL_setfuncs(L, song_methods, 0);
+#endif
     lua_pushliteral(L, "__index");
     lua_pushvalue(L, -2); // push the metatable
     lua_settable(L, -3); // metatable.__index = metatable
