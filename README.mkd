@@ -8,7 +8,8 @@ It offers two interfaces to edit tags:
 
 ## Releases
 
-Releases may be downloaded from [http://dev.exherbo.org/~alip/envtag]().
+Releases may be downloaded from [http://dev.exherbo.org/~alip/envtag](http://dev.exherbo.org/~alip/envtag).
+
 The latest release as of 26.12.2016 is `0.5`.
 
 ## Examples
