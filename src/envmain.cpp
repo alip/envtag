@@ -1,7 +1,7 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
 
 /*
- * Copyright (c) 2009, 2010 Ali Polatel <alip@exherbo.org>
+ * Copyright (c) 2009, 2010, 2016 Ali Polatel <alip@exherbo.org>
  *
  * This file is part of the envtag audio tagger. envtag is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -35,12 +35,12 @@
 using namespace std;
 
 void about(void) {
-    cerr << PACKAGE"-"VERSION GITHEAD << endl;
+    cerr << PACKAGE "-" VERSION GITHEAD << endl;
 }
 
 void usage(void) {
-    cerr << PACKAGE" -- Simple audio tagger" << endl;
-    cerr << "Usage: "PACKAGE" COMMAND [ARGS]" << endl << endl;
+    cerr << PACKAGE " -- Simple audio tagger" << endl;
+    cerr << "Usage: " PACKAGE " COMMAND [ARGS]" << endl << endl;
     cerr << "Commands:" << endl;
     cerr << "\tget\t\tGet tags" << endl;
     cerr << "\tset\t\tSet tags" << endl;
@@ -50,9 +50,9 @@ void usage(void) {
     cerr << "\tstats\t\tShow statistics" << endl;
     cerr << "See 'envtag COMMAND -h' for more information on a specific command." << endl << endl;
     cerr << "Environment variables:" << endl;
-    cerr << "\t"ENV_INIT":\tRun initialization code or load from file simiar to LUA_INIT" << endl << endl;
+    cerr << "\t" ENV_INIT ":\tRun initialization code or load from file simiar to LUA_INIT" << endl << endl;
     cerr << "Directories:" << endl;
-    cerr << "\t~"EXTRA_COMMAND_DIR":\tDirectory for extra commands" << endl;
+    cerr << "\t~" EXTRA_COMMAND_DIR ":\tDirectory for extra commands" << endl;
 }
 
 int main(int argc, char **argv)

@@ -1,7 +1,7 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
 
 /*
- * Copyright (c) 2009 Ali Polatel <alip@exherbo.org>
+ * Copyright (c) 2009, 2016 Ali Polatel <alip@exherbo.org>
  *
  * This file is part of the envtag audio tagger. envtag is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -574,7 +574,7 @@ lua_State *init_lua(void)
     // Add LIBEXECDIR/PACKAGE/modules/?.lua to package.path
     lua_getglobal(L, "package");
     assert(LUA_TTABLE == lua_type(L, 1));
-    lua_pushliteral(L, LIBEXECDIR"/"PACKAGE"/modules/?.lua;");
+    lua_pushliteral(L, LIBEXECDIR "/" PACKAGE "/modules/?.lua;");
     lua_getfield(L, 1, "path");
     assert(LUA_TSTRING == lua_type(L, 3));
     lua_concat(L, 2);
@@ -621,11 +621,11 @@ int docommand(lua_State *L, int argc, char **argv)
     lua_setglobal(L, "arg");
 
     if (iscommand(argv[0]))
-        path = LIBEXECDIR"/"PACKAGE"/commands/" + std::string(argv[0]) + ".lua";
+        path = LIBEXECDIR "/" PACKAGE "/commands/" + std::string(argv[0]) + ".lua";
     else {
         path = userpath(argv[0]);
         if (0 == path.compare("")) {
-            std::cerr << PACKAGE": getpwuid() failed: " << strerror(errno) << std::endl;
+            std::cerr << PACKAGE ": getpwuid() failed: " << strerror(errno) << std::endl;
             return EX_OSERR;
         }
     }
