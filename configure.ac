@@ -2,10 +2,21 @@ dnl vim: set sw=4 sts=4 ts=4 noet ft=config foldmethod=marker foldmarker={{{,}}}
 
 dnl {{{ program, version
 AC_PREREQ(2.59)
-AC_INIT([src/envmain.cpp])
 
-VERSION_MAJOR=0
-VERSION_MINOR=4
+m4_define([envtag_version_major],  [0])
+m4_define([envtag_version_minor],  [4])
+m4_define([envtag_version_full],   [envtag_version_major.envtag_version_minor])
+m4_define([envtag_version],        [envtag_version_full])
+
+AC_INIT([envtag], [envtag_version], [alip@exherbo.org], [envtag])
+
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_SRCDIR([src/envmain.cpp])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([build-aux])
+
+VERSION_MAJOR=envtag_version_major
+VERSION_MINOR=envtag_version_minor
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR"
 VERSION="$VERSION_FULL"
 
@@ -13,7 +24,8 @@ AC_SUBST([VERSION_MAJOR])
 AC_SUBST([VERSION_MINOR])
 AC_SUBST([VERSION_FULL])
 
-AM_INIT_AUTOMAKE(envtag, [$VERSION_FULL])
+AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip std-options subdir-objects foreign])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl {{{ git revision
 AC_MSG_CHECKING([for git head])
@@ -81,7 +93,6 @@ AC_SUBST([ENVTAG_CXXFLAGS])
 dnl }}}
 
 dnl {{{ output
-AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(
 		  Makefile
 		  src/Makefile
