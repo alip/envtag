@@ -4,7 +4,7 @@ dnl {{{ program, version
 AC_PREREQ(2.59)
 
 m4_define([envtag_version_major],  [0])
-m4_define([envtag_version_minor],  [4])
+m4_define([envtag_version_minor],  [5])
 m4_define([envtag_version_full],   [envtag_version_major.envtag_version_minor])
 m4_define([envtag_version],        [envtag_version_full])
 
