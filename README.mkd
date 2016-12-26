@@ -6,6 +6,11 @@ It offers two interfaces to edit tags:
  * Simple interface using environment variables.
  * Advanced interface using [Lua](http://www.lua.org/) scripts.
 
+## Releases
+
+Releases may be downloaded from [http://dev.exherbo.org/~alip/envtag]().
+The latest release as of 26.12.2016 is `0.5`.
+
 ## Examples
 
 Here are some examples of simple usage. For advanced usage, have a look at
