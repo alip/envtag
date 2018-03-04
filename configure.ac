@@ -63,8 +63,58 @@ PKG_CHECK_MODULES([taglib], [taglib >= 1.5],,
 dnl }}}
 
 dnl {{{ check for Lua
-PKG_CHECK_MODULES([lua], [lua >= 5.1],,
-				  [AC_MSG_ERROR([envtag requires lua-5.1 or newer])])
+AC_MSG_CHECKING([lua version to build with])
+AC_ARG_WITH([lua],
+			  AS_HELP_STRING([--with-lua],
+					         [Choose Lua version to build with (one of: lua, lua5.3, lua5.2, lua5.1, or luajit, default: auto, pick first available)]),
+			  [with_lua=$withval],
+			  [with_lua=auto])
+AC_MSG_RESULT([$with_lua])
+
+case "$with_lua" in
+auto)
+	PKG_CHECK_MODULES(lua, lua >= 5.1,,[
+		PKG_CHECK_MODULES(lua, lua5.3,,[
+			PKG_CHECK_MODULES(lua, lua5.2,,[
+				PKG_CHECK_MODULES(lua, lua5.1,,[
+					PKG_CHECK_MODULES(lua, luajit,,[
+						AC_MSG_ERROR([Package requirements (lua) were not met:
+
+No package 'lua5.3', 'lua5.2', 'lua5.1' or 'luajit' found.
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LUA_CFLAGS
+and LUA_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.])
+					])
+				])
+			])
+		])
+	])
+	;;
+lua5.[123]|luajit)
+	PKG_CHECK_MODULES(lua, $with_lua,,[
+		AC_MSG_ERROR([Package requirements (lua) were not met:
+
+No package '$with_lua' found.
+
+Consider using --with-lua=auto if you have another version of Lua
+installed.
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LUA_CFLAGS
+and LUA_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.])
+	])
+	;;
+*)
+	AC_MSG_ERROR([Invalid value for --with-lua, expected exactly one of lua5.3, lua5.2, lua5.1 or luajit])
+	;;
+esac
 dnl }}}
 
 dnl {{{ check for libmagic support
